@@ -3,8 +3,9 @@ Type: Package
 Title: Scalable Data Manipulation Via Spark
 Version: 0.1
 Date: 2015-05-18
-Author: Antonio Piccolboni <antonio@piccolboni.info>
+Author: Revolution Analytics
 Maintainer: Antonio Piccolboni <antonio@piccolboni.info>
 Description: Add a spark data source for dplyr
-License: Apache (>=2.0)
+URL: https://github.com/RevolutionAnalytics/dplyr-spark
+License: Apache (== 2.0)
 Imports: RJDBC, dplyr, DBI
