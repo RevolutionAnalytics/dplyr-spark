@@ -1,0 +1,6 @@
+.Rproj.user
+.Rhistory
+.RData
+metastore_db
+derby.log
+dplyr.spark.Rproj
