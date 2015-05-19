@@ -69,9 +69,50 @@ db_explain.SparkSQLConnection =
     out <- capture.output(print(expl))
     paste(out, collapse = "\n")}
 
+db_begin.SparkSQLConnection =
+  function(con, ...) TRUE
+
+db_commit.SparkSQLConnection =
+  function(con, ...) TRUE
+
+db_rollback.SparkSQLConnection =
+  function(con, ...) TRUE
+
+db_data_type.SparkSQLConnection =
+  function(con, fields, ...)
+    sapply(
+      fields,
+      function(x) {
+        switch(
+          class(x)[[1]],
+          character = "STRING",
+          Date =    "DATE",
+          factor =  "STRING",
+          integer = "INT",
+          logical = "BOOLEAN",
+          numeric = "DOUBLE",
+          POSIXct = "TIMESTAMP",
+          stop(
+            "Unknown class ",
+            paste(class(x), collapse = "/"), call. = FALSE))})
+
+db_insert_into.SparkSQLConnection =
+  function(con, table, values, ...) {
+    mask = sapply(values, is.factor)
+    values[mask] = lapply(values[mask], as.character)
+    mask = sapply(values, is.character)
+    values[mask] = lapply(values[mask], encodeString)
+    tmp = tempfile()
+    write.table(values, tmp, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\001")
+    stmt = build_sql("LOAD DATA LOCAL INPATH ", encodeString(tmp), " INTO TABLE ", ident(table), con = con)
+    dbGetQuery(con, stmt)}
+
+db_analyze.SparkSQLConnection =
+  function(con, table, ...) TRUE
+
 sql_escape_string.SparkSQLConnection =
   function(con, x)
-    sql_quote(x, " ")
+    sql_quote(x, "'")
 
 sql_escape_ident.SparkSQLConnection =
   function(con, x)
