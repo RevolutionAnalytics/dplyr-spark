@@ -1,0 +1,14 @@
+---
+  output:
+    html_document:
+      keep_md: yes
+---
+```{r, echo=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, tidy=FALSE, comment="", cache=FALSE, error=FALSE)
+```
+
+dplyr.spark
+===========
+
+This package adds a spark src for the dplyr package
