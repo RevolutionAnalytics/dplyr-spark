@@ -33,7 +33,7 @@
 src_SparkSQL =
   function(host = NULL, port = NULL, ...) {
     driverclass = "org.apache.hive.jdbc.HiveDriver"
-    dr = JDBC(driverclass, "/Users/antonio/Projects/Revolution/spark/assembly/target/scala-2.10/spark-assembly-1.4.0-SNAPSHOT-hadoop2.6.0.jar")
+    dr = JDBC(driverclass, Sys.getenv("HADOOP_JAR"))
     env = environment()
     SparkSQLConnection =
       methods::setRefClass("SparkSQLConnection", contains = "JDBCConnection", where = env)
