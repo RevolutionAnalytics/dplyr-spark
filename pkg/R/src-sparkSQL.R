@@ -60,7 +60,7 @@ db_query_fields.SparkSQLConnection =
     names(
       dbGetQuery(
         con,
-        build_sql("SELECT * FROM ", sql, " LIMIT 0", con = con)))
+        build_sql("SELECT * FROM ", sql_subquery(con, sql, "master"), " LIMIT 0", con = con)))
 
 db_explain.SparkSQLConnection =
   function(con, sql, ...) {
@@ -110,6 +110,16 @@ db_insert_into.SparkSQLConnection =
 db_analyze.SparkSQLConnection =
   function(con, table, ...) TRUE
 
+db_create_index.SparkSQLConnection =
+  function(con, table, columns, name = NULL, ...)
+    TRUE
+
+db_create_table.SparkSQLConnection =
+  function(con, table, types, temporary = FALSE, ...) {
+    table = tolower(table)
+    temporary = FALSE
+    NextMethod()}
+
 sql_escape_string.SparkSQLConnection =
   function(con, x)
     sql_quote(x, "'")
@@ -120,4 +130,4 @@ sql_escape_ident.SparkSQLConnection =
 
 tbl.src_SparkSQL =
   function(src, from, ...)
-    tbl_sql("SparkSQL", src = src, from = from, ...)
+    tbl_sql("SparkSQL", src = src, from = tolower(from), ...)
