@@ -124,9 +124,21 @@ db_create_index.SparkSQLConnection =
   function(con, table, columns, name = NULL, ...)
     TRUE
 
+
+tmp= new.env()
+tmp$tables = list()
+
 db_create_table.SparkSQLConnection =
-  function(con, table, types, temporary = FALSE, ...) {
+  function(con, table, types, temporary = TRUE, ...) {
     table = tolower(table)
+    if(temporary) tmp$tables = c(tmp$tables, table)
+    temporary = FALSE
+    NextMethod()}
+
+db_save_query.SparkSQLConnection =
+  function(con, sql, name, temporary = TRUE, ...){
+    name = tolower(name)
+    if(temporary) tmp$tables = c(tmp$tables, name)
     temporary = FALSE
     NextMethod()}
 
