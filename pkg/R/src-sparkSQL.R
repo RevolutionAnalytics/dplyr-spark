@@ -12,23 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# start thift server
-# $SPARK_HOME/sbin/start-thriftserver.sh
-
-# library(rJava)
-# .jinit()
-#
-# library(RJDBC)
-# driverclass = "org.apache.hive.jdbc.HiveDriver"
-# dr = JDBC(driverclass, "/Users/antonio/Projects/Revolution/spark/assembly/target/scala-2.10/spark-assembly-1.4.0-SNAPSHOT-hadoop2.6.0.jar")
-# url = "jdbc:hive2://localhost:10000"
-# con = dbConnect(drv = dr, url)
-#
-# res = dbGetQuery(con, "CREATE TABLE IF NOT EXISTS src (key INT, value STRING)")
-# res = dbGetQuery(con, "LOAD DATA LOCAL INPATH '../spark/examples/src/main/resources/kv1.txt' INTO TABLE src")
-# res = dbGetQuery(con, "FROM src SELECT key, value")
-
-
 
 setClass("SparkSQLConnection", contains = "JDBCConnection")
 
