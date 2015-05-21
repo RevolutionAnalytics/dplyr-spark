@@ -30,18 +30,17 @@
 
 
 
+setClass("SparkSQLConnection", contains = "JDBCConnection")
+
 src_SparkSQL =
   function(host = NULL, port = NULL, ...) {
     driverclass = "org.apache.hive.jdbc.HiveDriver"
     dr = JDBC(driverclass, Sys.getenv("HADOOP_JAR"))
-    env = environment()
-    SparkSQLConnection =
-      methods::setRefClass("SparkSQLConnection", contains = "JDBCConnection", where = env)
     con =
       dbConnect(
         drv = dr,
         url = paste0("jdbc:hive2://", host, ":", port))
-    con <- structure(con, class = c("SparkSQLConnection", "JDBCConnection"))
+    con = new("SparkSQLConnection", con)
     src_sql("SparkSQL", con, info = sys.call()[-1])}
 
 src_desc.src_SparkSQL =
