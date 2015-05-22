@@ -55,7 +55,7 @@ DYLD_FALLBACK_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Con
 ```
 </li></ul>
 
-The `PATH` environment variable needs to include `<spark-home>/bin`. 
+The `PATH` environment variable needs to include `<spark-home>/bin`. The `HADOOP_JAR` environment variable needs to be set to the main hadoop JAR file, something like `"<spark home>/assembly/target/scala-2.10/spark-assembly-1.4.0-SNAPSHOT-hadoop2.6.0.jar"` 
 
 To install, first install and load `devtools`
 
@@ -71,7 +71,7 @@ Then, to install from source:
 
 
 ```
-install_github("RevolutionAnalytics/dplyr-spark@0.1.0", subdir = "pkg")
+install_github("RevolutionAnalytics/dplyr-spark@0.1.1", subdir = "pkg")
 ```
 
 Binary packages will be added in the near future.
@@ -81,7 +81,7 @@ Binary packages will be added in the near future.
 
 ```
 install_url(
-  "https://github.com/RevolutionAnalytics/dplyr-spark/releases/download/0.1.0/dplyr.spark_0.1.0.tar.gz")
+  "https://github.com/RevolutionAnalytics/dplyr-spark/releases/download/0.1.1/dplyr.spark_0.1.1.tar.gz")
 ```
 
 Windows package:
@@ -89,12 +89,12 @@ Windows package:
 
 ```
 install_url(
-  "https://github.com/RevolutionAnalytics/dplyr-spark/releases/download/0.1.0/dplyr.spark_0.1.0.zip")
+  "https://github.com/RevolutionAnalytics/dplyr-spark/releases/download/0.1.1/dplyr.spark_0.1.1.zip")
 ```
 
 -->
 
-The current version is 0.1.0 .
+The current version is 0.1.1 .
 
 
 
