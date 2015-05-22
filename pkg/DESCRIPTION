@@ -7,5 +7,5 @@ Author: Revolution Analytics
 Maintainer: Antonio Piccolboni <antonio@piccolboni.info>
 Description: Add a spark data source for dplyr
 URL: https://github.com/RevolutionAnalytics/dplyr-spark
-License: Apache (== 2.0)
+License: Apache License(== 2.0)
 Imports: RJDBC, dplyr, DBI
