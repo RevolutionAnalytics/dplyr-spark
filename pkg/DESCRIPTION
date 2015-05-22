@@ -2,7 +2,7 @@ Package: dplyr.spark
 Type: Package
 Title: Scalable Data Manipulation Via Spark
 Version: 0.1.1
-Date: 2015-05-18
+Date: 2015-05-22
 Author: Revolution Analytics
 Maintainer: Antonio Piccolboni <antonio@piccolboni.info>
 Description: Add a spark data source for dplyr
