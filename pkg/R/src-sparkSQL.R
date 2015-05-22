@@ -16,7 +16,7 @@
 setClass("SparkSQLConnection", contains = "JDBCConnection")
 
 src_SparkSQL =
-  function(host = NULL, port = NULL, ...) {
+  function(host = "localhost", port = 10000) {
     driverclass = "org.apache.hive.jdbc.HiveDriver"
     dr = JDBC(driverclass, Sys.getenv("HADOOP_JAR"))
     con =
