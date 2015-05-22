@@ -96,8 +96,6 @@ install_url(
 
 The current version is 0.1.0 .
 
-While this package was first developed to support the activities of the RHadoop project, it's not part of it nor related to Hadoop or big data. While it has been in use for a few years to test packages used in production, version 3.0.0 marks the first version of the project that's offered for general use and as such it went through a major API re-design. Hence, versions 3.x.y should be considered beta  releases and no backward compatibility guarantees are offered, as it is customary in [semantic versioning](http://semver.org) for 0.x.y releases. We will switch to the normal major/minor/hotfix releases from version 4.
-
 
 
 ```r
