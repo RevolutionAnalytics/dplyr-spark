@@ -84,9 +84,7 @@ cat(
 '))
 ```
 
-Binary packages will be added in the near future.
-
-<!-- Linux package:
+Linux package:
 
 ```{r, echo=FALSE, comment=""}
 cat(
@@ -95,6 +93,9 @@ cat(
 '))
 ```
 
+A windows package will be added in the near future.
+
+<!-- 
 Windows package:
 
 ```{r, echo=FALSE, comment=""}
