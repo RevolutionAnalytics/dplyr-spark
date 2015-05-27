@@ -13,7 +13,10 @@
 # limitations under the License.
 
 
-setClass("SparkSQLConnection", contains = "JDBCConnection")
+setClass(
+  "SparkSQLConnection",
+  slots = list(tmptables = "environment"),
+  contains = "JDBCConnection")
 
 src_SparkSQL =
   function(host = "localhost", port = 10000) {
@@ -23,7 +26,12 @@ src_SparkSQL =
       dbConnect(
         drv = dr,
         url = paste0("jdbc:hive2://", host, ":", port))
-    con = new("SparkSQLConnection", con)
+    tmptables = new.env()
+    reg.finalizer(
+      tmptables,
+      function(en)
+        sapply(ls(en), function(x) db_drop_table(con, x)))
+    con = new("SparkSQLConnection", con, tmptables = tmptables )
     src_sql("SparkSQL", con, info = sys.call()[-1])}
 
 src_desc.src_SparkSQL =
@@ -107,21 +115,17 @@ db_create_index.SparkSQLConnection =
   function(con, table, columns, name = NULL, ...)
     TRUE
 
-
-tmp= new.env()
-tmp$tables = list()
-
 db_create_table.SparkSQLConnection =
   function(con, table, types, temporary = TRUE, ...) {
     table = tolower(table)
-    if(temporary) tmp$tables = c(tmp$tables, table)
+    if(temporary) con@tmptables[[table]] = TRUE
     temporary = FALSE
     NextMethod()}
 
 db_save_query.SparkSQLConnection =
   function(con, sql, name, temporary = TRUE, ...){
     name = tolower(name)
-    if(temporary) tmp$tables = c(tmp$tables, name)
+    if(temporary) con@tmptables[[table]] = TRUE
     temporary = FALSE
     NextMethod()}
 
