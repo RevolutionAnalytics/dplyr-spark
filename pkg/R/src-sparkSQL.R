@@ -63,15 +63,7 @@ db_query_fields.SparkSQLConnection =
         con,
         build_sql("SELECT * FROM ", sql_subquery(con, sql, "master"), " LIMIT 0", con = con)))
 
-#modeled after dplyr, MIT license
-db_explain.SparkSQLConnection =
-  function(con, sql, ...)
-    paste(
-      paste(
-        collapse = "\n",
-        capture.output(
-          print(
-            dbGetQuery(con, build_sql("EXPLAIN ", sql, con = con))))))
+db_explain.SparkSQLConnection = dplyr:::db_explain.MySQLConnection
 
 db_begin.SparkSQLConnection =
   function(con, ...) TRUE
@@ -82,24 +74,27 @@ db_commit.SparkSQLConnection =
 db_rollback.SparkSQLConnection =
   function(con, ...) TRUE
 
-db_data_type.SparkSQLConnection =
-  function(con, fields, ...)
-    sapply(
-      fields,
-      function(x) {
-        switch(
-          class(x)[[1]],
-          character = "STRING",
-          Date =    "DATE",
-          factor =  "STRING",
-          integer = "INT",
-          logical = "BOOLEAN",
-          numeric = "DOUBLE",
-          POSIXct = "TIMESTAMP",
-          stop(
-            "Unknown class ",
-            paste(class(x), collapse = "/"), call. = FALSE))})
+setMethod(
+  "dbDataType",
+  signature = "SparkSQLConnection",
+  function(dbObj, obj, ...)
+    switch(
+      class(obj)[[1]],
+      character = "STRING",
+      Date =    "DATE",
+      factor =  "STRING",
+      integer = "INT",
+      logical = "BOOLEAN",
+      numeric = "DOUBLE",
+      POSIXct = "TIMESTAMP",
+      stop(
+        "Can't map",
+        paste(class(obj), collapse = "/"),
+        "to a supported type",
+        call. = FALSE)))
 
+#modeled after db_insert_into methods in http://github.com/hadley/dplyr,
+#under MIT license
 db_insert_into.SparkSQLConnection =
   function(con, table, values, ...) {
     mask = sapply(values, is.factor)
@@ -107,9 +102,21 @@ db_insert_into.SparkSQLConnection =
     mask = sapply(values, is.character)
     values[mask] = lapply(values[mask], encodeString)
     tmp = tempfile()
-    write.table(values, tmp, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\001")
-    stmt = build_sql("LOAD DATA LOCAL INPATH ", encodeString(tmp), " INTO TABLE ", ident(table), con = con)
-    dbGetQuery(con, stmt)}
+    write.table(
+      values,
+      tmp,
+      quote = FALSE,
+      row.names = FALSE,
+      col.names = FALSE,
+      sep = "\001")
+    dbGetQuery(
+      con,
+      build_sql(
+        "LOAD DATA LOCAL INPATH ",
+        encodeString(tmp),
+        " INTO TABLE ",
+        ident(table),
+        con = con))}
 
 db_analyze.SparkSQLConnection =
   function(con, table, ...) TRUE
@@ -132,6 +139,12 @@ db_save_query.SparkSQLConnection =
     temporary = FALSE
     NextMethod()}
 
+db_explain.SparkSQLConnection =
+  function(con, sql, ...)
+    dbGetQuery(
+      con,
+      build_sql("EXPLAIN ", sql))
+
 sql_escape_string.SparkSQLConnection =
   function(con, x)
     sql_quote(x, "'")
@@ -140,6 +153,65 @@ sql_escape_ident.SparkSQLConnection =
   function(con, x)
     sql_quote(x, " ")
 
+#modeled after sql_join methods in http://github.com/hadley/dplyr,
+#under MIT license
+sql_join.SparkSQLConnection =
+  function (con, x, y, type = "inner", by = NULL, ...)  {
+    join =
+      switch(
+        type,
+        left = sql("LEFT"),
+        inner = sql("INNER"),
+        right = sql("RIGHT"),
+        full = sql("FULL"),
+        stop("Unknown join type:", type, call. = FALSE))
+    by = dplyr:::common_by(by, x, y)
+    x_names = dplyr:::auto_names(x$select)
+    y_names = dplyr:::auto_names(y$select)
+    uniques =
+      dplyr:::unique_names(
+        x_names,
+        y_names,
+        c(),
+        "_x",
+        "_y")
+    if (is.null(uniques))
+      sel_vars = c(x_names, y_names, by$y)
+    else {
+      x = update(x, select = setNames(x$select, uniques$x))
+      y = update(y, select = setNames(y$select, uniques$y))
+      by$x = unname(uniques$x[by$x])
+      by$y = unname(uniques$y[by$y])
+      sel_vars = unique(c(uniques$x, uniques$y))}
+    name.left = dplyr:::random_table_name()
+    name.right = dplyr:::random_table_name()
+    on =
+      dplyr:::sql_vector(
+        paste0(
+          sql_escape_ident(con, paste(name.left, by$x, sep = ".")),
+          " = ",
+          sql_escape_ident(con, paste(name.right, by$y, sep = ".")),
+          collapse = " AND "),
+        parens = TRUE)
+    cond = build_sql("ON ", on, con = con)
+    from =
+      build_sql(
+        sql_subquery(con, x$query$sql, name.left),
+        "\n", join, " JOIN \n", sql_subquery(con, y$query$sql, name.right),
+        "\n", cond, con = con)
+    attr(from, "vars") = lapply(sel_vars, as.name)
+    class(from) = c("join", class(from))
+    from}
+
 tbl.src_SparkSQL =
   function(src, from, ...)
     tbl_sql("SparkSQL", src = src, from = tolower(from), ...)
+
+#modeled after union methods in http://github.com/hadley/dplyr,
+#under MIT license
+union.tbl_SparkSQL =
+  function (x, y, copy = FALSE, ...) {
+    y = dplyr:::auto_copy(x, y, copy)
+    sql = sql_set_op(x$src$con, x, y, "UNION ALL")
+    dplyr:::update.tbl_sql(tbl(x$src, sql), group_by = groups(x)) }
+
