@@ -63,12 +63,15 @@ db_query_fields.SparkSQLConnection =
         con,
         build_sql("SELECT * FROM ", sql_subquery(con, sql, "master"), " LIMIT 0", con = con)))
 
+#modeled after dplyr, MIT license
 db_explain.SparkSQLConnection =
-  function(con, sql, ...) {
-    exsql <- build_sql("EXPLAIN ", sql, con = con)
-    expl <- dbGetQuery(con, exsql)
-    out <- capture.output(print(expl))
-    paste(out, collapse = "\n")}
+  function(con, sql, ...)
+    paste(
+      paste(
+        collapse = "\n",
+        capture.output(
+          print(
+            dbGetQuery(con, build_sql("EXPLAIN ", sql, con = con))))))
 
 db_begin.SparkSQLConnection =
   function(con, ...) TRUE
