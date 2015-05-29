@@ -71,7 +71,7 @@ Then, to install from source:
 
 
 ```
-install_github("RevolutionAnalytics/dplyr-spark@0.1.1", subdir = "pkg")
+install_github("RevolutionAnalytics/dplyr-spark@0.2.0", subdir = "pkg")
 ```
 
 Linux package:
@@ -79,7 +79,7 @@ Linux package:
 
 ```
 install_url(
-  "https://github.com/RevolutionAnalytics/dplyr-spark/releases/download/0.1.1/dplyr.spark_0.1.1.tar.gz")
+  "https://github.com/RevolutionAnalytics/dplyr-spark/releases/download/0.2.0/dplyr.spark_0.2.0.tar.gz")
 ```
 
 A windows package will be added in the near future.
@@ -90,12 +90,12 @@ Windows package:
 
 ```
 install_url(
-  "https://github.com/RevolutionAnalytics/dplyr-spark/releases/download/0.1.1/dplyr.spark_0.1.1.zip")
+  "https://github.com/RevolutionAnalytics/dplyr-spark/releases/download/0.2.0/dplyr.spark_0.2.0.zip")
 ```
 
 -->
 
-The current version is 0.1.1 .
+The current version is 0.2.0 .
 
 
 
