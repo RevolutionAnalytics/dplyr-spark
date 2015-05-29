@@ -108,16 +108,15 @@ spark.src = src_SparkSQL("localhost", "10000")
 
 
 Monkey patches for `dplyr`: 
+
  - `assignInNamespace("unique_name", function() paste0("tmp", strsplit(as.character(runif(1)), "\\.")[[1]][2]), ns = "dplyr")`. Makes subqueries work. See issue #4. Can't make it work in the package, you need to enter it at top level.
  - `assign('n_distinct', function(x) {build_sql("COUNT(DISTINCT ", x, ")")}, envir=base_agg)` makes `n_distinct` work.
  
-Known limitations: see issue #3 and other issues, please do before you get frustrated. In particular the current implementation does not clean up temp tables. Working on it. Prepare to drop many tables.
+Known limitations: see issue #3 and other issues, please do before you get frustrated.
 
 Now you can follow along the `dplyr` tutorial, using this data source as opposed to, say, a `sqlite` source.
 
 
 
-For new releases, subscribe to `dplyr-spark`'s Release notes [feed](https://github.com/RevolutionAnalytics/dplyr.spark/releases.atom) or join the [RHadoop Google group](https://groups.google.com/forum/#!forum/rhadoop). The latter is also the best place to get support (well, second only to the [issue tracker](http://github.com/RevolutionAnalytics/dplyr.spark/issues))
-
-
+For new releases, subscribe to `dplyr-spark`'s Release notes [feed](https://github.com/RevolutionAnalytics/dplyr.spark/releases.atom) or join the [RHadoop Google group](https://groups.google.com/forum/#!forum/rhadoop). The latter is also the best place to get support, together with the [issue tracker](http://github.com/RevolutionAnalytics/dplyr.spark/issues))
 
