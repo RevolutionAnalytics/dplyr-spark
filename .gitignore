@@ -5,3 +5,4 @@ metastore_db
 derby.log
 dplyr.spark.Rproj
 README.html
+dplyr.spark_*.tar.gz
