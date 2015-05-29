@@ -135,7 +135,7 @@ db_create_table.SparkSQLConnection =
 db_save_query.SparkSQLConnection =
   function(con, sql, name, temporary = TRUE, ...){
     name = tolower(name)
-    if(temporary) con@tmptables[[table]] = TRUE
+    if(temporary) con@tmptables[[name]] = TRUE
     temporary = FALSE
     NextMethod()}
 
