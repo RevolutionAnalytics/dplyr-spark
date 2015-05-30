@@ -61,7 +61,7 @@ db_query_fields.SparkSQLConnection =
     names(
       dbGetQuery(
         con,
-        build_sql("SELECT * FROM ", sql_subquery(con, sql, "master"), " LIMIT 0", con = con)))
+        build_sql("SELECT * FROM ", sql, " LIMIT 0", con = con)))
 
 db_explain.SparkSQLConnection = dplyr:::db_explain.MySQLConnection
 
