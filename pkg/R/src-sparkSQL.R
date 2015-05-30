@@ -32,7 +32,10 @@ src_SparkSQL =
       function(en)
         sapply(ls(en), function(x) db_drop_table(con, x)))
     con = new("SparkSQLConnection", con, tmptables = tmptables )
-    src_sql("SparkSQL", con, info = sys.call()[-1])}
+    src_sql(
+      "SparkSQL",
+      con,
+      info = mget(names(formals()), sys.frame(sys.nframe())))}
 
 src_desc.src_SparkSQL =
   function(x) {
