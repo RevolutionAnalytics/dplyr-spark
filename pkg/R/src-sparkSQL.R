@@ -156,6 +156,10 @@ sql_escape_ident.SparkSQLConnection =
   function(con, x)
     sql_quote(x, " ")
 
+fully_qualify =
+  function(fields, tables) {
+    paste(tables, fields, sep =".") }
+
 #modeled after sql_join methods in http://github.com/hadley/dplyr,
 #under MIT license
 sql_join.SparkSQLConnection =
@@ -175,32 +179,39 @@ sql_join.SparkSQLConnection =
       dplyr:::unique_names(
         x_names,
         y_names,
-        c(),
+        by$x[by$x == by$y],
         "_x",
         "_y")
-    if (is.null(uniques))
-      sel_vars = c(x_names, y_names, by$y)
+    name.left = dplyr:::random_table_name()
+    name.right = dplyr:::random_table_name()
+    if (is.null(uniques)){
+      sel_vars =
+        c(
+          fully_qualify(x_names, name.left),
+          setdiff(y_names, x_names))}
     else {
       x = update(x, select = setNames(x$select, uniques$x))
       y = update(y, select = setNames(y$select, uniques$y))
       by$x = unname(uniques$x[by$x])
       by$y = unname(uniques$y[by$y])
-      sel_vars = unique(c(uniques$x, uniques$y))}
-    name.left = dplyr:::random_table_name()
-    name.right = dplyr:::random_table_name()
+      sel_vars =
+        c(
+          fully_qualify(uniques$x, name.left),
+          setdiff(uniques$y, x_names))}
     on =
       dplyr:::sql_vector(
         paste0(
-          sql_escape_ident(con, paste(name.left, by$x, sep = ".")),
+          sql_escape_ident(con, fully_qualify(by$x, name.left)),
           " = ",
-          sql_escape_ident(con, paste(name.right, by$y, sep = ".")),
+          sql_escape_ident(con, fully_qualify(by$y, name.right)),
           collapse = " AND "),
         parens = TRUE)
     cond = build_sql("ON ", on, con = con)
     from =
       build_sql(
         sql_subquery(con, x$query$sql, name.left),
-        "\n", join, " JOIN \n", sql_subquery(con, y$query$sql, name.right),
+        "\n", join, " JOIN \n",
+        sql_subquery(con, y$query$sql, name.right),
         "\n", cond, con = con)
     attr(from, "vars") = lapply(sel_vars, as.name)
     class(from) = c("join", class(from))
