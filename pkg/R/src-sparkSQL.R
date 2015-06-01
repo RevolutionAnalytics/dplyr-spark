@@ -217,6 +217,35 @@ sql_join.SparkSQLConnection =
     class(from) = c("join", class(from))
     from}
 
+#modeled after sql_semi_join methods in http://github.com/hadley/dplyr,
+#under MIT license
+sql_semi_join.SparkSQLConnection =
+  function (con, x, y, anti = FALSE, by = NULL, ...) {
+    if(anti) stop("antijoins not implemented yet")
+    by = dplyr:::common_by(by, x, y)
+    left = escape(ident("L_LEFT"), con = con)
+    right = escape(ident("R_RIGHT"), con = con)
+    on =
+      dplyr:::sql_vector(
+        paste0(
+          left, ".",
+          sql_escape_ident(con, by$x), " = ",
+          right, ".",
+          sql_escape_ident(con, by$y)),
+        collapse = " AND ",
+        parens = TRUE)
+    from =
+      build_sql(
+        "SELECT * FROM ",
+        sql_subquery(con, x$query$sql, "L_LEFT"), "\n",
+        "WHERE ",
+        if (anti) sql("NOT "),
+        "EXISTS (\n", "  SELECT 1 FROM ",
+        sql_subquery(con, y$query$sql, "R_RIGHT"), "\n",
+        "  WHERE ", on, ")")
+    attr(from, "vars") = x$select
+    from}
+
 tbl.src_SparkSQL =
   function(src, from, ...)
     tbl_sql("SparkSQL", src = src, from = tolower(from), ...)
