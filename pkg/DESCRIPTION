@@ -1,7 +1,7 @@
 Package: dplyr.spark
 Type: Package
 Title: Scalable Data Manipulation Via Spark
-Version: 0.2.1
+Version: 0.2.2
 Date: 2015-06-01
 Author: Revolution Analytics <rhadoop@revolutionanalytics.com>
 Maintainer: Revolution Analytics <rhadoop@revolutionanalytics.com>
