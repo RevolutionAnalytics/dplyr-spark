@@ -1,3 +1,11 @@
+supported.data.frame =
+  function()
+    rdata.frame(
+      elements =
+        mixture(list(rinteger, rdouble, rcharacter, rlogical, rDate)),
+      nrow = c(min = 1),
+      ncol = c(min = 1))
+
 rdplyr_expression =
   function(height){
     sample(rselect, rarrange, rfilter, rmutate, rgroup_by, rsummarize) %>%
@@ -52,26 +60,24 @@ normalize =
     as.data.frame(d.f)}
 
 cmp =
-  function(d.f, src) {
-    d.f = normalize(d.f)
-    d.f1 = normalize(collect(src))
-    isTRUE(all.equal(d.f, d.f1))}
+  function(x, y) {
+    x = normalize(x)
+    y = normalize(y)
+    isTRUE(all.equal(x, y))}
 
-to = test(
-  forall(
-    x =
-      rdata.frame(
-        elements =
-          mixture(list(rinteger, rdouble, rcharacter, rlogical, rDate)),
-        nrow = c(min = 1),
-        ncol = c(min = 1)),
-    name = dplyr:::random_table_name(),
-    src = my_db, {
-      names(x) = paste0("a", bitops::cksum(names(x)))
-      rs = rselect(x)
-      retval =
-        cmp(
-          rs(x),
-          rs(copy_to(src, x, name)))
-      db_drop_table(table = paste0('`', name,'`'), con = src$con)
-      retval}))
+equiv.test =
+  function(expr.gen){
+    test(
+      forall(
+        x = supported.data.frame(),
+        name = dplyr:::random_table_name(),
+        src = my_db, {
+          names(x) = gsub("\\.", "_", names(x))
+          rs = expr.gen(x)
+          retval =
+            cmp(
+              rs(x),
+              collect(rs(copy_to(src, x, name))))
+          db_drop_table(table = paste0('`', name,'`'), con = src$con)
+          retval}),
+      about = deparse(substitute(expr.gen)))}
