@@ -1,0 +1,99 @@
+library(dplyr)
+library(dplyr.spark)
+Sys.setenv(
+  HADOOP_JAR =
+    "/Users/antonio/Projects/Revolution/spark/assembly/target/scala-2.10/spark-assembly-1.4.0-SNAPSHOT-hadoop2.6.0.jar")
+assignInNamespace(
+  "unique_name",
+  function()
+    paste0("tmp", strsplit(as.character(runif(1)), "\\.")[[1]][2]),
+  ns = "dplyr")
+assign(
+  'n_distinct',
+  function(x) {
+    build_sql("COUNT(DISTINCT ", x, ")")},
+  envir=base_agg)
+
+
+my_db = src_SparkSQL()
+
+library(nycflights13)
+
+flights = copy_to(my_db, flights, temporary = TRUE)
+airlines = copy_to(my_db, airlines, temporary = TRUE)
+weather = copy_to(my_db, weather, temporary = TRUE)
+planes = copy_to(my_db, planes, temporary = TRUE)
+airports = copy_to(my_db, airports, temporary = TRUE)
+
+flights = tbl(my_db, "flights")
+airlines = tbl(my_db, "airlines")
+weather = tbl(my_db, "weather")
+planes = tbl(my_db, "planes")
+airports = tbl(my_db, "airports")
+
+
+flights2 =
+  flights %>%
+  select(year:day, hour, origin, dest, tailnum, carrier)
+
+flights2 %>%
+  left_join(airlines)
+
+flights2 %>% left_join(weather)
+
+flights2 %>% left_join(planes, by = "tailnum")
+
+flights2 %>% left_join(airports, c("dest" = "faa"))
+# not in dplyr dply/#1181
+flights2 %>% left_join(airports, dest == faa)
+
+flights2 %>% left_join(airports, c("origin" = "faa"))
+
+
+(df1 = data_frame(x = c(1, 2), y = 2:1))
+(df2 = data_frame(x = c(1, 3), a = 10, b = "a"))
+
+df1 = copy_to(my_db, df1, temporary = TRUE)
+df2 = copy_to(my_db, df2, temporary = TRUE)
+
+df1 = tbl(my_db, "df1")
+df2 = tbl(my_db, "df2")
+
+df1 %>% inner_join(df2) %>% knitr::kable()
+
+df1 %>% left_join(df2)
+
+#broken
+df1 %>% right_join(df2)
+
+df2 %>% left_join(df1)
+
+#broken
+df1 %>% full_join(df2)
+
+planes = copy_to(my_db, planes)
+planes = tbl(my_db, "planes")
+
+#broken
+flights %>%
+  anti_join(planes, by = "tailnum") %>%
+  count(tailnum, sort = TRUE)
+
+df1 %>% nrow()
+#broken by design
+df1 %>% inner_join(df2, by = "x") %>% nrow()
+#broken
+df1 %>% semi_join(df2, by = "x") %>% nrow()
+
+
+#all set op but union missin in hiveql, union broken
+intersect(df1, df2)
+# Note that we get 3 rows, not 4
+union(df1, df2)
+setdiff(df1, df2)
+setdiff(df2, df1)
+
+#broken
+full_join(df1, df2) %>% str()
+
+
