@@ -277,8 +277,10 @@ tbl.src_SparkSQL =
 collect.tbl_SparkSQL =
   function(x, ...) {
     x = compute(x)
-    res = NextMethod()
-    db.types = DBI::dbGetQuery(x$src$con, paste("describe", x$from))$data_type
+    res = NextMethod(x = x)
+    db.types = DBI::dbGetQuery(x$src$con, paste("describe", x$from)
+                               )$data_type
+    db_drop_table(table = paste0('`', x$from,'`'), con = x$src$con)
     sapply(
       seq_along(res),
       function(i)
