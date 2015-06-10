@@ -62,14 +62,16 @@ to = test(
     x =
       rdata.frame(
         elements =
-          mixture(list(rinteger, rdouble, rcharacter, rlogical, rfactor)),
+          mixture(list(rinteger, rdouble, rcharacter, rlogical, rDate)),
         nrow = c(min = 1),
         ncol = c(min = 1)),
-    name = tolower(unname(rcharacter(size = ~1))),
+    name = dplyr:::random_table_name(),
     src = my_db, {
       names(x) = paste0("a", bitops::cksum(names(x)))
       rs = rselect(x)
-      on.exit(db_drop_table(src$con, name))
-      cmp(
-        rs(x),
-        rs(copy_to(src, x, name)))}))
+      retval =
+        cmp(
+          rs(x),
+          rs(copy_to(src, x, name)))
+      db_drop_table(table = paste0('`', name,'`'), con = src$con)
+      retval}))
