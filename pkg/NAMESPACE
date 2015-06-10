@@ -1,3 +1,4 @@
+S3method(copy_to, src_SparkSQL)
 S3method(db_begin, SparkSQLConnection)
 S3method(db_analyze, SparkSQLConnection)
 S3method(db_commit, SparkSQLConnection)

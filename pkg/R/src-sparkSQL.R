@@ -51,6 +51,10 @@ src_translate_env.src_SparkSQL =
         sd =  sql_prefix("STDDEV"),
         var = sql_prefix("VARIANCE")))
 
+copy_to.src_SparkSQL =
+  function(dest, df, name = gsub("\\.", "_", deparse(substitute(df))), ...) {
+    NextMethod()}
+
 db_list_tables.SparkSQLConnection =
   function(con)
     dbGetQuery(con, "show tables")$tableName
@@ -90,11 +94,11 @@ setMethod(
       logical = "BOOLEAN",
       numeric = "DOUBLE",
       POSIXct = "TIMESTAMP",
+      raw = "BINARY",
       stop(
         "Can't map",
         paste(class(obj), collapse = "/"),
-        "to a supported type",
-        call. = FALSE)))
+        "to a supported type")))
 
 #modeled after db_insert_into methods in http://github.com/hadley/dplyr,
 #under MIT license
@@ -154,7 +158,7 @@ sql_escape_string.SparkSQLConnection =
 
 sql_escape_ident.SparkSQLConnection =
   function(con, x)
-    sql_quote(x, " ")
+    sql_quote(gsub("\\.", "_", tolower(x)), "`")
 
 fully_qualify =
   function(fields, tables) {
