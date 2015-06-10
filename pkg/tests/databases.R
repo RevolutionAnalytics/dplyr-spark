@@ -1,3 +1,6 @@
+# derivative of dplyr introductory material, http://github.com/hadley/dplyr
+# presumably under MIT license
+
 library(dplyr)
 library(dplyr.spark)
 Sys.setenv(
