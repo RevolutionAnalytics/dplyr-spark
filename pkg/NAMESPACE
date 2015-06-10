@@ -1,3 +1,4 @@
+S3method(collect, tbl_SparkSQL)
 S3method(copy_to, src_SparkSQL)
 S3method(db_begin, SparkSQLConnection)
 S3method(db_analyze, SparkSQLConnection)

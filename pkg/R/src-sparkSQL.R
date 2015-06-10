@@ -100,6 +100,26 @@ setMethod(
         paste(class(obj), collapse = "/"),
         "to a supported type")))
 
+convert.from.DB =
+  function(type) {
+    switch(
+      tolower(type),
+      tinyint = as.integer,
+      smallint = as.integer,
+      int = as.integer,
+      bigint = as.numeric,
+      boolean = as.logical,
+      float = as.double,
+      double = as.double,
+      string = as.character,
+      binary = as.raw,
+      timestamp = as.POSIXct,
+      decimal = as.double,
+      date = as.Date,
+      varchar = as.character,
+      char = as.character,
+      stop("Don't know what to map ", type, " to"))}
+
 #modeled after db_insert_into methods in http://github.com/hadley/dplyr,
 #under MIT license
 db_insert_into.SparkSQLConnection =
@@ -253,6 +273,18 @@ sql_semi_join.SparkSQLConnection =
 tbl.src_SparkSQL =
   function(src, from, ...)
     tbl_sql("SparkSQL", src = src, from = tolower(from), ...)
+
+collect.tbl_SparkSQL =
+  function(x, ...) {
+    x = compute(x)
+    res = NextMethod()
+    db.types = DBI::dbGetQuery(x$src$con, paste("describe", x$from))$data_type
+    sapply(
+      seq_along(res),
+      function(i)
+        res[[i]] <<- convert.from.DB(db.types[i])(res[[i]]))
+    res}
+
 
 #modeled after union methods in http://github.com/hadley/dplyr,
 #under MIT license
