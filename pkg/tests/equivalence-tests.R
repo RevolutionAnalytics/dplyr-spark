@@ -15,12 +15,27 @@
 
 library(quickcheck)
 
-supported.data.frame =
+colnames =
+  function(x)
+    sapply(base::colnames(x), function(x) paste0("`", x, "`"))
+
+rsupported.data.frame =
   function() {
     df =
       rdata.frame(
         elements =
           mixture(list(rinteger, rdouble, rcharacter, rlogical, rDate)),
+        nrow = c(min = 1),
+        ncol = c(min = 1))
+    names(df) = gsub("\\.", "_", names(df))
+    df}
+
+rnumeric.data.frame =
+  function() {
+    df =
+      rdata.frame(
+        elements =
+          mixture(list(rinteger, rdouble)),
         nrow = c(min = 1),
         ncol = c(min = 1))
     names(df) = gsub("\\.", "_", names(df))
@@ -74,10 +89,10 @@ rmutate =
 filter.expr =
   function(x, df) {
     if(class(df[[x]]) %in% c("integer", "double", "numeric"))
-      paste(x , ">", sample(df[[x]], 1))
+      paste(x , ">", sample(df[[x]], 1) + 0.00001)
     else{
       if(class(df[[x]]) == "Date")
-        paste(x, "> as.Date(", x, ")")
+        paste(x, "> ", as.character(sample(df[[x]], 1)))
       else
         TRUE}}
 
@@ -92,13 +107,21 @@ rsummarize =
   function(df) {
     cols = somecols(df)
     function(x)
-      summarize_(x, .dots = cols)}
+      summarize_(x, .dots = lapply(cols, function(x) paste("mean(", x, ")")))}
 
 rgroup_by =
   function(df) {
     cols = somecols(df)
     function(x)
       group_by_(x, .dots = cols)}
+
+
+rgroup_by_summarize =
+  function(x){
+    rs = rsummarize(x)
+    rg = rgroup_by(x)
+    function(y)
+      rs(rg(y))}
 
 normalize =
   function(df) {
@@ -113,13 +136,13 @@ cmp =
     isTRUE(all.equal(x, y))}
 
 equiv.test =
-  function(expr.gen){
+  function(expr.gen, dfgen = rsupported.data.frame){
     test(
       forall(
-        x = supported.data.frame(),
+        x = dfgen(),
         rx = expr.gen(x),
         name = dplyr:::random_table_name(),
-        src = my_db, {
+        src = src_SparkSQL(), {
           retval =
             cmp(
               rx(x),
@@ -129,6 +152,8 @@ equiv.test =
       about = deparse(substitute(expr.gen)))}
 
 
-#equiv.test(rselect)
-#equiv.test(rarrange)
-#equiv.test(rmutate)
+equiv.test(rselect)
+equiv.test(rarrange)
+equiv.test(rmutate)
+equiv.test(rfilter)
+equiv.test(rgroup_by_summarize, rnumeric.data.frame)
