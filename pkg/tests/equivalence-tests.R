@@ -13,66 +13,98 @@
 # limitations under the License.
 
 
+library(quickcheck)
+
 supported.data.frame =
-  function()
-    rdata.frame(
-      elements =
-        mixture(list(rinteger, rdouble, rcharacter, rlogical, rDate)),
-      nrow = c(min = 1),
-      ncol = c(min = 1))
+  function() {
+    df =
+      rdata.frame(
+        elements =
+          mixture(list(rinteger, rdouble, rcharacter, rlogical, rDate)),
+        nrow = c(min = 1),
+        ncol = c(min = 1))
+    names(df) = gsub("\\.", "_", names(df))
+    df}
 
 rdplyr_expression =
   function(height){
     sample(rselect, rarrange, rfilter, rmutate, rgroup_by, rsummarize) %>%
-  if(height > 0)
-    rdplyr_expression(height - 1)
-else identity}
+      if(height > 0)
+        rdplyr_expression(height - 1)
+    else identity}
 
 somecols =
-  function(d.f)
-    unname(rsample(colnames(d.f), size = ~sample(1:ncol(d.f), 1), replace = FALSE))
+  function(df)
+    unname(rsample(colnames(df), size = ~sample(1:ncol(df), 1), replace = FALSE))
 
 rselect =
-  function(d.f){
-    cols = somecols(d.f)
+  function(df){
+    cols = somecols(df)
     function(x)
       select_(x, .dots = cols)}
 
+arrange.expr =
+  function(x)
+    sample(
+      c(x,
+        paste("desc(", x, ")")), 1)[[1]]
+
 rarrange =
-  function(d.f) {
-    cols = somecols(d.f)
+  function(df) {
+    cols = somecols(df)
+    cols = lapply(cols, arrange.expr)
     function(x)
-      arrange(x, cols)}
+      arrange_(x, .dots = cols)}
+
+mutate.expr =
+  function(x, df) {
+    if(is.numeric(df[[x]]))
+      paste(sample( c("","-"), 1), x)
+    else
+      x}
 
 rmutate =
-  function(d.f) {
-    cols = somecols(d.f)
+  function(df) {
+    cols = somecols(df)
+    cols = lapply(cols, mutate.expr, df = df)
+    cols = setNames(cols, letters[1:length(cols)])
     function(x)
-      mutate(x, cols)}
+      mutate_(x, .dots = cols)}
+
+filter.expr =
+  function(x, df) {
+    if(class(df[[x]]) %in% c("integer", "double", "numeric"))
+      paste(x , ">", sample(df[[x]], 1))
+    else{
+      if(class(df[[x]]) == "Date")
+        paste(x, "> as.Date(", x, ")")
+      else
+        TRUE}}
 
 rfilter =
-  function(d.f) {
-    cols = somecols(d.f)
+  function(df) {
+    cols = somecols(df)[[1]]
+    cols = unique(lapply(cols, filter.expr, df = df))
     function(x)
-      filter(x, cols)}
+      filter_(x, .dots = cols)}
 
 rsummarize =
-  function(d.f) {
-    cols = somecols(d.f)
+  function(df) {
+    cols = somecols(df)
     function(x)
-      summarize(x, cols)}
+      summarize_(x, .dots = cols)}
 
 rgroup_by =
-  function(d.f) {
-    cols = somecols(d.f)
+  function(df) {
+    cols = somecols(df)
     function(x)
-      group_by(x, cols)}
+      group_by_(x, .dots = cols)}
 
 normalize =
-  function(d.f) {
-    d.f = arrange_(d.f, .dots = colnames(d.f))
-    rownames(d.f) = NULL
-    as.data.frame(d.f)}
+  function(df) {
+    df = arrange_(df, .dots = colnames(df))
+    rownames(df) = NULL
+    as.data.frame(df)}
 
 cmp =
   function(x, y) {
@@ -85,14 +117,18 @@ equiv.test =
     test(
       forall(
         x = supported.data.frame(),
+        rx = expr.gen(x),
         name = dplyr:::random_table_name(),
         src = my_db, {
-          names(x) = gsub("\\.", "_", names(x))
-          rs = expr.gen(x)
           retval =
             cmp(
-              rs(x),
-              collect(rs(copy_to(src, x, name))))
+              rx(x),
+              collect(rx(copy_to(src, x, name))))
           db_drop_table(table = paste0('`', name,'`'), con = src$con)
           retval}),
       about = deparse(substitute(expr.gen)))}
+
+
+#equiv.test(rselect)
+#equiv.test(rarrange)
+#equiv.test(rmutate)
