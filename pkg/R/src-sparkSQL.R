@@ -292,8 +292,8 @@ collect.tbl_SparkSQL =
 mutate_.tbl_SparkSQL =
   function (.data, ..., .dots) {
     dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
-    input = lapply(dots, function(x) partial_eval(x$expr, .data, map(dots, function(x) call("(", x$expr))))
-    #input = lapply(dots, function(x) partial_eval(x$expr, .data, map(dots, "expr")))
+    input <- partial_eval(dots, .data)
+    input = lapply(input, function(x) partial_eval(x, .data, input))
     .data$mutate <- TRUE
     new <- update(.data, select = c(.data$select, input))
     if (dplyr:::uses_window_fun(input, .data)) {
