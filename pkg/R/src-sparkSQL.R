@@ -287,6 +287,19 @@ collect.tbl_SparkSQL =
         res[[i]] <<- convert.from.DB(db.types[i])(res[[i]]))
     res}
 
+#modeled after mutate_ methods in http://github.com/hadley/dplyr,
+#under MIT license
+mutate_.tbl_SparkSQL =
+  function (.data, ..., .dots) {
+    dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
+    input = lapply(dots, function(x) partial_eval(x$expr, .data, map(dots, function(x) call("(", x$expr))))
+    #input = lapply(dots, function(x) partial_eval(x$expr, .data, map(dots, "expr")))
+    .data$mutate <- TRUE
+    new <- update(.data, select = c(.data$select, input))
+    if (dplyr:::uses_window_fun(input, .data)) {
+      collapse(new) }
+    else {
+      new}}
 
 #modeled after union methods in http://github.com/hadley/dplyr,
 #under MIT license
