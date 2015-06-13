@@ -53,7 +53,7 @@ src_translate_env.src_SparkSQL =
 
 copy_to.src_SparkSQL =
   function(dest, df, name = gsub("\\.", "_", deparse(substitute(df))), ...) {
-    NextMethod()}
+    NextMethod(name = name)}
 
 db_list_tables.SparkSQLConnection =
   function(con)
