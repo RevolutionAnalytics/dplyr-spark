@@ -313,3 +313,10 @@ union.tbl_SparkSQL =
     sql = sql_set_op(x$src$con, x, y, "UNION ALL")
     dplyr:::update.tbl_sql(tbl(x$src, sql), group_by = groups(x)) }
 
+#modeled after intersect methods in http://github.com/hadley/dplyr,
+#under MIT license
+intersect.tbl_SparkSQL =
+  function (x, y, copy = FALSE, ...){
+    if(!all(colnames(x) == colnames(y)))
+      stop("Tables not compatible")
+    inner_join(x, y, copy = copy)}
