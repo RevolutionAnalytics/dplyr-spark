@@ -22,18 +22,19 @@ my_db = src_SparkSQL()
 
 library(nycflights13)
 
+#first time around
 flights = copy_to(my_db, flights, temporary = TRUE)
 airlines = copy_to(my_db, airlines, temporary = TRUE)
 weather = copy_to(my_db, weather, temporary = TRUE)
 planes = copy_to(my_db, planes, temporary = TRUE)
 airports = copy_to(my_db, airports, temporary = TRUE)
 
+#thereon
 flights = tbl(my_db, "flights")
 airlines = tbl(my_db, "airlines")
 weather = tbl(my_db, "weather")
 planes = tbl(my_db, "planes")
 airports = tbl(my_db, "airports")
-
 
 flights2 =
   flights %>%
@@ -47,8 +48,8 @@ flights2 %>% left_join(weather)
 flights2 %>% left_join(planes, by = "tailnum")
 
 flights2 %>% left_join(airports, c("dest" = "faa"))
-# not in dplyr dply/#1181
-flights2 %>% left_join(airports, dest == faa)
+# not in dplyr dplyr/#1181
+# flights2 %>% left_join(airports, dest == faa)
 
 flights2 %>% left_join(airports, c("origin" = "faa"))
 
@@ -62,25 +63,25 @@ df2 = copy_to(my_db, df2, temporary = TRUE)
 df1 = tbl(my_db, "df1")
 df2 = tbl(my_db, "df2")
 
-df1 %>% inner_join(df2) %>% knitr::kable()
+df1 %>% inner_join(df2)
 
 df1 %>% left_join(df2)
 
-#broken
-df1 %>% right_join(df2)
+# broken
+# df1 %>% right_join(df2)
 
 df2 %>% left_join(df1)
 
 #broken
-df1 %>% full_join(df2)
+#df1 %>% full_join(df2)
 
 planes = copy_to(my_db, planes)
 planes = tbl(my_db, "planes")
 
 #broken
-flights %>%
-  anti_join(planes, by = "tailnum") %>%
-  count(tailnum, sort = TRUE)
+# flights %>%
+#   anti_join(planes, by = "tailnum") %>%
+#   count(tailnum, sort = TRUE)
 
 df1 %>% nrow()
 #broken by design

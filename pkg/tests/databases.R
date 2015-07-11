@@ -20,20 +20,20 @@ assign(
 my_db = src_SparkSQL()
 
 library(nycflights13)
-flights_SparkSQL = copy_to(my_db, flights, temporary = TRUE)
-flights_SparkSQL = tbl(my_db, "flights")
-flights_SparkSQL
+flights = copy_to(my_db, flights, temporary = TRUE)
+flights = tbl(my_db, "flights")
+flights
 
 tbl(my_db, sql("SELECT * FROM flights"))
 
 ## ------------------------------------------------------------------------
-select(flights_SparkSQL, year:day, dep_delay, arr_delay)
-filter(flights_SparkSQL, dep_delay > 240)
-arrange(flights_SparkSQL, year, month, day)
-mutate(flights_SparkSQL, speed = air_time / distance)
-summarise(flights_SparkSQL, delay = mean(dep_time))
+select(flights, year:day, dep_delay, arr_delay)
+filter(flights, dep_delay > 240)
+arrange(flights, year, month, day)
+mutate(flights, speed = air_time / distance)
+summarise(flights, delay = mean(dep_time))
 
-c1 = filter(flights_SparkSQL, year == 2013, month == 1, day == 1)
+c1 = filter(flights, year == 2013, month == 1, day == 1)
 c2 = select(c1, year, month, day, carrier, dep_delay, air_time, distance)
 c3 = mutate(c2, speed = distance / air_time * 60)
 c4 = arrange(c3, year, month, day, carrier)
@@ -46,7 +46,7 @@ c4$query
 
 explain(c4)
 
-by_tailnum = group_by(flights_SparkSQL, tailnum)
+by_tailnum = group_by(flights, tailnum)
 delay = summarise(by_tailnum,
   count = n(),
   dist = mean(distance),
@@ -56,9 +56,16 @@ delay_local = collect(delay)
 delay_local
 
 
-daily = group_by(flights_SparkSQL, year, month, day)
+daily = group_by(flights, year, month, day)
 
 #broken
+#can be replaced with
+#
+# SELECT flights.year, flights.month, flights.day, flight, flights.arr_delay
+# FROM flights
+# JOIN (SELECT flights.year, flights.month, flights.day,  min(flights.arr_delay) as mindel FROM flights GROUP BY year, month, day) jt
+# ON flights.year = jt.year AND flights.month = jt.month AND flights.day = jt.day and arr_delay = mindel;
+
 bestworst = daily %>%
   select(flight, arr_delay) %>%
   filter(arr_delay == min(arr_delay) || arr_delay == max(arr_delay))
@@ -78,59 +85,51 @@ library(ggplot2)
 #from the tutorial for data frames
 
 
-dim(flights_SparkSQL)
-head(flights_SparkSQL)
+dim(flights)
+head(flights)
 
-filter(flights_SparkSQL, month == 1, day == 1)
+filter(flights, month == 1, day == 1)
 
-arrange(flights_SparkSQL, year, month, day)
+arrange(flights, year, month, day)
 
-arrange(flights_SparkSQL, desc(arr_delay))
+arrange(flights, desc(arr_delay))
 
-select(flights_SparkSQL, year, month, day)
-select(flights_SparkSQL, year:day)
-select(flights_SparkSQL, -(year:day))
+select(flights, year, month, day)
+select(flights, year:day)
+select(flights, -(year:day))
 
-select(flights_SparkSQL, tail_num = tailnum)
+select(flights, tail_num = tailnum)
 
-rename(flights_SparkSQL, tail_num = tailnum)
+rename(flights, tail_num = tailnum)
 
-distinct(select(flights_SparkSQL, tailnum))
-distinct(select(flights_SparkSQL, origin, dest))
+distinct(select(flights, tailnum))
+distinct(select(flights, origin, dest))
 
 mutate(
-  flights_SparkSQL,
+  flights,
   gain = arr_delay - dep_delay,
   speed = distance / air_time * 60)
 
-#broken:sequential eval
 mutate(
-  flights_SparkSQL,
+  flights,
   gain = arr_delay - dep_delay,
   gain_per_hour = gain / (air_time / 60))
 
-#alternative
-flights_SparkSQL %>%
-  mutate(gain = arr_delay - dep_delay) %>%
-  compute %>%
-  mutate(gain_per_hour = gain / (air_time / 60))
-
-#broken:sequential eval
 transmute(
-  flights_SparkSQL,
+  flights,
   gain = arr_delay - dep_delay,
   gain_per_hour = gain / (air_time / 60))
 
 summarise(
-  flights_SparkSQL,
+  flights,
   delay = mean(dep_delay))
 
 #not in dplyr for sql
-slice(flights_SparkSQL, 1:10)
-sample_n(flights_SparkSQL, 10)
-sample_frac(flights_SparkSQL, 0.01)
+# slice(flights, 1:10)
+# sample_n(flights, 10)
+# sample_frac(flights, 0.01)
 
-by_tailnum = group_by(flights_SparkSQL, tailnum)
+by_tailnum = group_by(flights, tailnum)
 delay = summarise(by_tailnum,
                    count = n(),
                    dist = mean(distance),
@@ -144,18 +143,18 @@ ggplot(
   geom_smooth() +
   scale_size_area()
 
-destinations = group_by(flights_SparkSQL, dest)
+destinations = group_by(flights, dest)
 summarise(
   destinations,
   planes = n_distinct(tailnum),
   flights = n())
 
-daily = group_by(flights_SparkSQL, year, month, day)
+daily = group_by(flights, year, month, day)
 (per_day   = summarise(daily, flights = n()))
 (per_month = summarise(per_day, flights = sum(flights)))
 (per_year  = summarise(per_month, flights = sum(flights)))
 
-a1 = group_by(flights_SparkSQL, year, month, day)
+a1 = group_by(flights, year, month, day)
 a2 = select(a1, arr_delay, dep_delay)
 a3 =
   summarise(
@@ -168,13 +167,13 @@ a4
 filter(
   summarise(
     select(
-      group_by(flights_SparkSQL, year, month, day),
+      group_by(flights, year, month, day),
       arr_delay, dep_delay),
     arr = mean(arr_delay),
     dep = mean(dep_delay)),
   arr > 30 | dep > 30)
 
-flights_SparkSQL %>%
+flights %>%
   group_by(year, month, day) %>%
   select(arr_delay, dep_delay) %>%
   summarise(
