@@ -51,8 +51,12 @@ src_translate_env.src_SparkSQL =
         sd =  sql_prefix("STDDEV"),
         var = sql_prefix("VARIANCE")))
 
+dedot = function(x) gsub("\\.", "_", x)
+
 copy_to.src_SparkSQL =
-  function(dest, df, name = gsub("\\.", "_", deparse(substitute(df))), ...) {
+  function(dest, df, name =  dedot(deparse(substitute(df))), ...) {
+    force(name)
+    names(df) = dedot(names(df))
     NextMethod(name = name)}
 
 db_list_tables.SparkSQLConnection =
@@ -178,7 +182,7 @@ sql_escape_string.SparkSQLConnection =
 
 sql_escape_ident.SparkSQLConnection =
   function(con, x)
-    sql_quote(gsub("\\.", "_", tolower(x)), "`")
+    sql_quote(tolower(x), "`")
 
 fully_qualify =
   function(fields, tables) {
