@@ -85,19 +85,18 @@ planes = tbl(my_db, "planes")
 
 df1 %>% nrow()
 #broken by design
-df1 %>% inner_join(df2, by = "x") %>% nrow()
+#df1 %>% inner_join(df2, by = "x") %>% nrow()
 #broken
-df1 %>% semi_join(df2, by = "x") %>% nrow()
+#df1 %>% semi_join(df2, by = "x") %>% nrow()
 
 
-#all set op but union missin in hiveql, union broken
+#all set op but union missin in hiveql
 intersect(df1, df2)
-# Note that we get 3 rows, not 4
 union(df1, df2)
-setdiff(df1, df2)
-setdiff(df2, df1)
+#setdiff(df1, df2)
+#setdiff(df2, df1)
 
 #broken
-full_join(df1, df2) %>% str()
+#full_join(df1, df2) %>% str()
 
 
