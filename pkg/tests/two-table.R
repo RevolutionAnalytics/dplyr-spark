@@ -85,7 +85,8 @@ df1 %>% nrow()
 #broken by design
 #df1 %>% inner_join(df2, by = "x") %>% nrow()
 #broken
-#df1 %>% semi_join(df2, by = "x") %>% nrow()
+#
+df1 %>% semi_join(df2, by = "x") %>% nrow()
 
 
 #all set op but union missin in hiveql

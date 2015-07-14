@@ -338,3 +338,27 @@ right_join.tbl_SparkSQL =
 full_join.tbl_SparkSQL =
   function (x, y, by = NULL, copy = FALSE, auto_index = FALSE, ...) {
     some_join(x = x, y = y, by = by, copy = copy, auto_index = auto_index, ..., type = "full")}
+
+#modeled after sql_semi_join methods in http://github.com/hadley/dplyr,
+#under MIT license
+sql_semi_join.SparkSQLConnection =
+  function (con, x, y, anti = FALSE, by = NULL, ...){
+    by = dplyr:::common_by(by, x, y)
+    left = dplyr:::escape(ident("_LEFT"), con = con)
+    right = dplyr:::escape(ident("_RIGHT"), con = con)
+    on =
+      dplyr:::sql_vector(
+        paste0(
+          left, ".", dplyr:::sql_escape_ident(con, by$x), " = ",
+          right, ".", dplyr:::sql_escape_ident(con, by$y)),
+        collapse = " AND ",
+        parens = TRUE)
+    from =
+      dplyr:::build_sql(
+        "SELECT * FROM ",
+        dplyr:::sql_subquery(con, x$query$sql, "_LEFT"), "\n",
+        "LEFT SEMI JOIN ",
+        dplyr:::sql_subquery(con, y$query$sql, "_RIGHT"), "\n",
+        "  ON ", on)
+    attr(from, "vars") = x$select
+    from}
