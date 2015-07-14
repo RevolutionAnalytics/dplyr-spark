@@ -5,7 +5,7 @@ library(dplyr)
 library(dplyr.spark)
 Sys.setenv(
   HADOOP_JAR =
-    "/Users/antonio/Projects/Revolution/spark/assembly/target/scala-2.10/spark-assembly-1.4.0-SNAPSHOT-hadoop2.6.0.jar")
+    "/Users/antonio/Projects/Revolution/spark/assembly/target/scala-2.10/spark-assembly-1.4.0-SNAPSHOT-hadoop2.4.0.jar")
 assignInNamespace(
   "unique_name",
   function()
@@ -63,17 +63,18 @@ df2 = copy_to(my_db, df2, temporary = TRUE)
 df1 = tbl(my_db, "df1")
 df2 = tbl(my_db, "df2")
 
-df1 %>% inner_join(df2)
+collect(df1 %>% inner_join(df2))
 
-df1 %>% left_join(df2)
+collect(df1 %>% left_join(df2))
 
 # broken
-# df1 %>% right_join(df2)
+#
+collect(df1 %>% right_join(df2))
 
-df2 %>% left_join(df1)
+collect(df2 %>% left_join(df1))
 
 #broken
-#df1 %>% full_join(df2)
+collect(df1 %>% full_join(df2))
 
 planes = copy_to(my_db, planes)
 planes = tbl(my_db, "planes")

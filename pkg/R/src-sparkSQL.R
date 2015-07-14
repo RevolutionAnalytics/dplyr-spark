@@ -317,6 +317,24 @@ union.tbl_SparkSQL =
 #under MIT license
 intersect.tbl_SparkSQL =
   function (x, y, copy = FALSE, ...){
-    if(!all(colnames(x) == colnames(y)))
+    if(suppressWarnings(!all(colnames(x) == colnames(y))))
       stop("Tables not compatible")
     inner_join(x, y, copy = copy)}
+
+#modeled after join methods in http://github.com/hadley/dplyr,
+#under MIT license
+some_join =
+  function (x, y, by = NULL, copy = FALSE, auto_index = FALSE, ..., type) {
+    by <- dplyr:::common_by(by, x, y)
+    y <- dplyr:::auto_copy(x, y, copy, indexes = if (auto_index)
+      list(by$y))
+    sql <- dplyr:::sql_join(x$src$con, x, y, type = type, by = by)
+    dplyr:::update.tbl_sql(tbl(x$src, sql), group_by = groups(x))}
+
+right_join.tbl_SparkSQL =
+  function (x, y, by = NULL, copy = FALSE, auto_index = FALSE, ...) {
+    some_join(x = x, y = y, by = by, copy = copy, auto_index = auto_index, ..., type = "right")}
+
+full_join.tbl_SparkSQL =
+  function (x, y, by = NULL, copy = FALSE, auto_index = FALSE, ...) {
+    some_join(x = x, y = y, by = by, copy = copy, auto_index = auto_index, ..., type = "full")}
