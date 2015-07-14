@@ -67,13 +67,10 @@ collect(df1 %>% inner_join(df2))
 
 collect(df1 %>% left_join(df2))
 
-# broken
-#
 collect(df1 %>% right_join(df2))
 
 collect(df2 %>% left_join(df1))
 
-#broken
 collect(df1 %>% full_join(df2))
 
 planes = copy_to(my_db, planes)
