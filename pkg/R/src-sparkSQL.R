@@ -282,8 +282,8 @@ collect.tbl_SparkSQL =
   function(x, ...) {
     x = compute(x)
     res = NextMethod(x = x)
-    db.types = DBI::dbGetQuery(x$src$con, paste("describe", x$from)
-                               )$data_type
+    db.types =
+      DBI::dbGetQuery(x$src$con, paste("describe", x$from))$data_type
     db_drop_table(table = paste0('`', x$from,'`'), con = x$src$con)
     sapply(
       seq_along(res),
@@ -295,11 +295,11 @@ collect.tbl_SparkSQL =
 #under MIT license
 mutate_.tbl_SparkSQL =
   function (.data, ..., .dots) {
-    dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
-    input <- partial_eval(dots, .data)
+    dots = lazyeval::all_dots(.dots, ..., all_named = TRUE)
+    input = partial_eval(dots, .data)
     input = lapply(input, function(x) partial_eval(x, .data, input))
-    .data$mutate <- TRUE
-    new <- update(.data, select = c(.data$select, input))
+    .data$mutate = TRUE
+    new = update(.data, select = c(.data$select, input))
     if (dplyr:::uses_window_fun(input, .data)) {
       collapse(new) }
     else {
@@ -325,10 +325,10 @@ intersect.tbl_SparkSQL =
 #under MIT license
 some_join =
   function (x, y, by = NULL, copy = FALSE, auto_index = FALSE, ..., type) {
-    by <- dplyr:::common_by(by, x, y)
-    y <- dplyr:::auto_copy(x, y, copy, indexes = if (auto_index)
+    by = dplyr:::common_by(by, x, y)
+    y = dplyr:::auto_copy(x, y, copy, indexes = if (auto_index)
       list(by$y))
-    sql <- dplyr:::sql_join(x$src$con, x, y, type = type, by = by)
+    sql = dplyr:::sql_join(x$src$con, x, y, type = type, by = by)
     dplyr:::update.tbl_sql(tbl(x$src, sql), group_by = groups(x))}
 
 right_join.tbl_SparkSQL =
