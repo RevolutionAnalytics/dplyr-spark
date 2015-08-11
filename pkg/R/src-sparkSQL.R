@@ -44,12 +44,13 @@ src_desc.src_SparkSQL =
 src_translate_env.src_SparkSQL =
   function(x)
     sql_variant(
-      base_scalar,
-      sql_translator(
+      scalar = base_scalar,
+      aggregate = sql_translator(
         .parent = base_agg,
         n = function() sql("COUNT(*)"),
         sd =  sql_prefix("STDDEV"),
-        var = sql_prefix("VARIANCE")))
+        var = sql_prefix("VARIANCE")),
+      window = base_win)
 
 dedot = function(x) gsub("\\.", "_", x)
 
