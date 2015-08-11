@@ -15,9 +15,9 @@
 
 library(quickcheck)
 
-colnames =
+sql_colnames =
   function(x)
-    sapply(base::colnames(x), function(x) paste0("`", x, "`"))
+    sapply(colnames(x), function(x) paste0("`", x, "`"))
 
 rsupported.data.frame =
   function() {
@@ -50,7 +50,7 @@ rdplyr_expression =
 
 somecols =
   function(df)
-    unname(rsample(colnames(df), size = ~sample(1:ncol(df), 1), replace = FALSE))
+    unname(rsample(sql_colnames(df), size = ~sample(1:ncol(df), 1), replace = FALSE))
 
 rselect =
   function(df){
@@ -125,7 +125,7 @@ rgroup_by_summarize =
 
 normalize =
   function(df) {
-    df = arrange_(df, .dots = colnames(df))
+    df = arrange_(df, .dots = sql_colnames(df))
     rownames(df) = NULL
     as.data.frame(df)}
 
