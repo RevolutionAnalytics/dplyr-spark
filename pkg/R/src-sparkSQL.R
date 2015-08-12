@@ -41,16 +41,33 @@ src_desc.src_SparkSQL =
   function(x) {
     paste(x$info, collapse = ":")}
 
+make.win.fun =
+  function(f)
+    function(x) {
+      dplyr:::over(
+        dplyr:::build_sql(
+          dplyr:::sql(f),
+          list(x)),
+        dplyr:::partition_group(),
+        NULL,
+        frame = c(-Inf, Inf))}
+
 src_translate_env.src_SparkSQL =
   function(x)
     sql_variant(
       scalar = base_scalar,
-      aggregate = sql_translator(
-        .parent = base_agg,
-        n = function() sql("COUNT(*)"),
-        sd =  sql_prefix("STDDEV"),
-        var = sql_prefix("VARIANCE")),
-      window = base_win)
+      aggregate =
+        sql_translator(
+          .parent = base_agg,
+          n = function() sql("COUNT(*)"),
+          sd =  sql_prefix("STDDEV_POP"),
+          var = sql_prefix("VAR_SAMP")),
+      window =
+        sql_translator(
+          .parent = base_win,
+          n = function() sql("COUNT(*)"),
+          sd =  make.win.fun("STDDEV_SAMP"),
+          var = make.win.fun("VAR_SAMP")))
 
 dedot = function(x) gsub("\\.", "_", x)
 
