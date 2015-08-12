@@ -5,7 +5,7 @@ library(dplyr)
 library(dplyr.spark)
 Sys.setenv(
   HADOOP_JAR =
-    "/Users/antonio/Projects/Revolution/spark/assembly/target/scala-2.10/spark-assembly-1.4.0-SNAPSHOT-hadoop2.4.0.jar")
+    "/Users/antonio/Projects/Revolution/spark/assembly/target/scala-2.10/spark-assembly-1.5.0-SNAPSHOT-hadoop2.4.0.jar")
 
 my_db = src_SparkSQL()
 
@@ -65,20 +65,16 @@ collect(df1 %>% full_join(df2))
 planes = copy_to(my_db, planes)
 planes = tbl(my_db, "planes")
 
-#broken
-# flights %>%
-#   anti_join(planes, by = "tailnum") %>%
-#   count(tailnum, sort = TRUE)
+flights %>%
+  anti_join(planes, by = "tailnum") %>%
+  count(tailnum, sort = TRUE)
 
 df1 %>% nrow()
-#broken by design
-#df1 %>% inner_join(df2, by = "x") %>% nrow()
-#broken
-#
+#returns NA
+df1 %>% inner_join(df2, by = "x") %>% nrow()
+#returns NA
 df1 %>% semi_join(df2, by = "x") %>% nrow()
 
-
-#all set op but union missin in hiveql
 intersect(df1, df2)
 union(df1, df2)
 #setdiff(df1, df2)

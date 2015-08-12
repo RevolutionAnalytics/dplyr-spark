@@ -132,7 +132,9 @@ summarise(
 
 daily = group_by(flights, year, month, day)
 (per_day   = summarise(daily, flights = n()))
+#broken too many open files
 (per_month = summarise(per_day, flights = sum(flights)))
+#broken too many open files
 (per_year  = summarise(per_month, flights = sum(flights)))
 
 a1 = group_by(flights, year, month, day)

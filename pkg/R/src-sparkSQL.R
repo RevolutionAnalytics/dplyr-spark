@@ -209,7 +209,7 @@ fully_qualify =
 #modeled after sql_join methods in http://github.com/hadley/dplyr,
 #under MIT license
 sql_join.SparkSQLConnection =
-  function (con, x, y, type = "inner", by = NULL, ...)  {
+  function (con, x, y, type = "inner", by = NULL, ...) {
     join =
       switch(
         type,
@@ -218,50 +218,38 @@ sql_join.SparkSQLConnection =
         right = sql("RIGHT"),
         full = sql("FULL"),
         stop("Unknown join type:", type, call. = FALSE))
-    by = dplyr:::common_by(by, x, y)
-    x_names = dplyr:::auto_names(x$select)
-    y_names = dplyr:::auto_names(y$select)
-    uniques =
-      dplyr:::unique_names(
-        x_names,
-        y_names,
-        by$x[by$x == by$y],
-        "_x",
-        "_y")
-    name.left = dplyr:::random_table_name()
-    name.right = dplyr:::random_table_name()
-    if (is.null(uniques)){
-      sel_vars =
-        c(
-          fully_qualify(x_names, name.left),
-          setdiff(y_names, x_names))}
+    by = common_by(by, x, y)
+    x_names = auto_names(x$select)
+    y_names = auto_names(y$select)
+    uniques = unique_names(x_names, y_names, NULL)
+    if (is.null(uniques)) {
+      sel_vars = c(x_names, y_names)}
     else {
       x = update(x, select = setNames(x$select, uniques$x))
       y = update(y, select = setNames(y$select, uniques$y))
       by$x = unname(uniques$x[by$x])
       by$y = unname(uniques$y[by$y])
-      sel_vars =
-        c(
-          fully_qualify(uniques$x, name.left),
-          setdiff(uniques$y, x_names))}
+      sel_vars = unique(c(uniques$x, uniques$y))}
+    name.left = unique_name()
+    name.right = unique_name()
     on =
-      dplyr:::sql_vector(
+      sql_vector(
         paste0(
-          sql_escape_ident(con, fully_qualify(by$x, name.left)),
+          paste(sql_escape_ident(con, name.left),sql_escape_ident(con, by$x), sep = "."),
           " = ",
-          sql_escape_ident(con, fully_qualify(by$y, name.right)),
+          paste(sql_escape_ident(con, name.right), sql_escape_ident(con, by$y), sep = "."),
           collapse = " AND "),
         parens = TRUE)
     cond = build_sql("ON ", on, con = con)
     from =
       build_sql(
-        sql_subquery(con, x$query$sql, name.left),
-        "\n", join, " JOIN \n",
-        sql_subquery(con, y$query$sql, name.right),
-        "\n", cond, con = con)
+        "SELECT * FROM ", sql_subquery(con, x$query$sql, name.left),
+        "\n\n", join, " JOIN \n\n", sql_subquery(con, y$query$sql, name.right),
+        "\n\n", cond, con = con)
     attr(from, "vars") = lapply(sel_vars, as.name)
-    class(from) = c("join", class(from))
     from}
+
+environment(sql_join.SparkSQLConnection) = environment(select_)
 
 #modeled after sql_semi_join methods in http://github.com/hadley/dplyr,
 #under MIT license
@@ -323,21 +311,27 @@ mutate_.tbl_SparkSQL =
     else {
       new}}
 
+assert.compatible =
+  function(x, y)
+    if(suppressWarnings(!all(colnames(x) == colnames(y))))
+      stop("Tables not compatible")
+
 #modeled after union methods in http://github.com/hadley/dplyr,
 #under MIT license
 union.tbl_SparkSQL =
   function (x, y, copy = FALSE, ...) {
+    assert.compatible(x, y)
     y = dplyr:::auto_copy(x, y, copy)
     sql = sql_set_op(x$src$con, x, y, "UNION ALL")
-    dplyr:::update.tbl_sql(tbl(x$src, sql), group_by = groups(x)) }
+    distinct(dplyr:::update.tbl_sql(tbl(x$src, sql), group_by = groups(x)))}
 
 #modeled after intersect methods in http://github.com/hadley/dplyr,
 #under MIT license
 intersect.tbl_SparkSQL =
   function (x, y, copy = FALSE, ...){
-    if(suppressWarnings(!all(colnames(x) == colnames(y))))
-      stop("Tables not compatible")
-    inner_join(x, y, copy = copy)}
+    assert.compatible(x, y)
+    xy = inner_join(x, y, copy = copy)
+    select_(xy, .dots = setNames(colnames(xy)[1:(NCOL(xy)/2)], colnames(x)))}
 
 #modeled after join methods in http://github.com/hadley/dplyr,
 #under MIT license
@@ -384,24 +378,24 @@ sql_semi_join.SparkSQLConnection =
 over  =
   function (expr, partition = NULL, order = NULL, frame = NULL)
   {
-    args <- (!is.null(partition)) + (!is.null(order)) + (!is.null(frame))
+    args = (!is.null(partition)) + (!is.null(order)) + (!is.null(frame))
     if (args == 0) {
       stop("Must supply at least one of partition, order, frame",
            call. = FALSE)
     }
     if (!is.null(partition)) {
-      partition <- build_sql("PARTITION BY ",sql_vector(partition,
+      partition = build_sql("PARTITION BY ",sql_vector(partition,
                                                         collapse = ", ",  parens = FALSE))
     }
     if (!is.null(order)) {
-      order <- build_sql("ORDER BY ", sql_vector(order, collapse = ", ", parens = FALSE))
+      order = build_sql("ORDER BY ", sql_vector(order, collapse = ", ", parens = FALSE))
     }
     if (!is.null(frame)) {
       if (is.numeric(frame))
-        frame <- rows(frame[1], frame[2])
-      frame <- build_sql("ROWS ", frame)
+        frame = rows(frame[1], frame[2])
+      frame = build_sql("ROWS ", frame)
     }
-    over <- sql_vector(compact(list(partition, order, frame)),
+    over = sql_vector(compact(list(partition, order, frame)),
                        parens = TRUE)
     build_sql(expr, " OVER ", over)
   }
