@@ -29,13 +29,23 @@ build/mvn -Pyarn -Phadoop-2.4 -Dhadoop.version=2.4.0 -DskipTests -Phive -Phive-t
 It may work with other versions, but we need the hive and hive-thriftserver support. Then start the thift service.
 
 ```
-sbin/start-thriftserver.sh 
+sbin/start-thriftserver.sh  
+
+```
+
+I've had to tamper with some memory options. Unless you see an out-of-memory error, you probably don't need them, but if you do here's how I start it:
+
+
+```
+sbin/start-thriftserver.sh  --driver-memory 1G --executor-memory 2G
+
 ```
 
 `dplyr.spark` has a few dependencies: get them with
 
 ```
-install.packages(c(`RJDBC`, `dplyr`, `DBI`))
+install.packages(c("RJDBC", "dplyr", "DBI", "devtools"))
+devtools::install_github("hadley/purrr") #soon to be on CRAN, then we don't need devtools
 ```
 
 Indirectly `RJDBC` needs `rJava`. Make sure that you have `rJava` working with:
@@ -47,22 +57,26 @@ library(rJava)
 
 This is only a test, in general you don't need it before loading `dplyr.spark`.
 
-<ul> <li>Mac digression :
+
+<style type="text/css">
+<!--
+.tab { margin-left: 5%; }
+-->
+</style>
+<div class="tab">
+#### Mac Digression
 
 On the mac this required two different versions of java installed, [for real](http://andrewgoldstone.com/blog/2015/02/03/rjava/), and in particular this shell variable set
-
-```
+<pre>
 DYLD_FALLBACK_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/server/
-```
-
+</pre>
 The specific path may be different, particularly the version numbers. To start Rstudio (optional, you can use a different GUI or none at all), which doesn't read environment variables, you can enter the following command:
-
-```
+<pre>
 DYLD_FALLBACK_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/server/ open -a rstudio
-```
-</li></ul>
+</pre>
+</div>
 
-The `PATH` environment variable needs to include `<spark-home>/bin`. The `HADOOP_JAR` environment variable needs to be set to the main hadoop JAR file, something like `"<spark home>/assembly/target/scala-2.10/spark-assembly-1.4.0-SNAPSHOT-hadoop2.6.0.jar"` 
+The `HADOOP_JAR` environment variable needs to be set to the main hadoop JAR file, something like `"<spark home>/assembly/target/scala-2.10/spark-assembly-1.4.0-SNAPSHOT-hadoop2.6.0.jar"` 
 
 To install, first install and load `devtools`
 
@@ -93,9 +107,9 @@ cat(
 '))
 ```
 
+<!-- 
 A windows package will be added in the near future.
 
-<!-- 
 Windows package:
 
 ```{r, echo=FALSE, comment=""}
@@ -118,16 +132,6 @@ library(dplyr.spark)
 
 spark.src = src_SparkSQL("localhost", "10000")
 ```
-
-
-Monkey patches for `dplyr`: 
-
- - `assignInNamespace("unique_name", function() paste0("tmp", strsplit(as.character(runif(1)), "\\.")[[1]][2]), ns = "dplyr")`. Makes subqueries work. See issue #4. Can't make it work in the package, you need to enter it at top level.
- - `assign('n_distinct', function(x) {build_sql("COUNT(DISTINCT ", x, ")")}, envir=base_agg)` makes `n_distinct` work.
- 
-Known limitations: see issue #3 and other issues, please do before you get frustrated.
-
-Now you can follow along the `dplyr` tutorial, using this data source as opposed to, say, a `sqlite` source.
 
 
 
