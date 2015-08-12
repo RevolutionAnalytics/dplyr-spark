@@ -7,17 +7,6 @@ Sys.setenv(
 HADOOP_JAR =
 "/Users/antonio/Projects/Revolution/spark/assembly/target/scala-2.10/spark-assembly-1.5.0-SNAPSHOT-hadoop2.4.0.jar")
 
-assignInNamespace(
-  "unique_name",
-  function()
-    paste0("tmp", strsplit(as.character(runif(1)), "\\.")[[1]][2]),
-  ns = "dplyr")
-assign(
-  'n_distinct',
-  function(x) {
-    build_sql("COUNT(DISTINCT ", x, ")")},
-  envir=base_agg)
-
 my_db = src_SparkSQL()
 
 library(nycflights13)
@@ -59,20 +48,11 @@ delay_local
 
 daily = group_by(flights, year, month, day)
 
-#broken
-#can be replaced with
-#
-# SELECT flights.year, flights.month, flights.day, flight, flights.arr_delay
-# FROM flights
-# JOIN (SELECT flights.year, flights.month, flights.day,  min(flights.arr_delay) as mindel FROM flights GROUP BY year, month, day) jt
-# ON flights.year = jt.year AND flights.month = jt.month AND flights.day = jt.day and arr_delay = mindel;
-
 bestworst = daily %>%
   select(flight, arr_delay) %>%
   filter(arr_delay == min(arr_delay) || arr_delay == max(arr_delay))
 bestworst
 
-#broken
 ranked = daily %>%
   select(arr_delay) %>%
   mutate(rank = rank(desc(arr_delay)))

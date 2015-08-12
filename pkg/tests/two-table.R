@@ -6,17 +6,6 @@ library(dplyr.spark)
 Sys.setenv(
   HADOOP_JAR =
     "/Users/antonio/Projects/Revolution/spark/assembly/target/scala-2.10/spark-assembly-1.4.0-SNAPSHOT-hadoop2.4.0.jar")
-assignInNamespace(
-  "unique_name",
-  function()
-    paste0("tmp", strsplit(as.character(runif(1)), "\\.")[[1]][2]),
-  ns = "dplyr")
-assign(
-  'n_distinct',
-  function(x) {
-    build_sql("COUNT(DISTINCT ", x, ")")},
-  envir=base_agg)
-
 
 my_db = src_SparkSQL()
 
