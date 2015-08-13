@@ -400,6 +400,10 @@ over  =
 
 environment (over) = environment(select_)
 
+cache =
+  function(tbl) {
+    DBI::dbSendQuery(my_db$con, paste("CACHE TABLE", tbl$from))
+    tbl}
 
 .onLoad = function(._,.__) {
   assign(
