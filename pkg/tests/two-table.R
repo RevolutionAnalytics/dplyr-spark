@@ -80,7 +80,6 @@ union(df1, df2)
 #setdiff(df1, df2)
 #setdiff(df2, df1)
 
-#broken
-#full_join(df1, df2) %>% str()
+full_join(df1, df2) %>% str()
 
 
