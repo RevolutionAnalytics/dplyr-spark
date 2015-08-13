@@ -376,32 +376,29 @@ sql_semi_join.SparkSQLConnection =
     from}
 
 over  =
-  function (expr, partition = NULL, order = NULL, frame = NULL)
-  {
+  function (expr, partition = NULL, order = NULL, frame = NULL)  {
     args = (!is.null(partition)) + (!is.null(order)) + (!is.null(frame))
     if (args == 0) {
       stop("Must supply at least one of partition, order, frame",
-           call. = FALSE)
-    }
+           call. = FALSE) }
     if (!is.null(partition)) {
-      partition = build_sql("PARTITION BY ",sql_vector(partition,
-                                                        collapse = ", ",  parens = FALSE))
-    }
+      partition =
+        build_sql(
+          "PARTITION BY ",
+          sql_vector(partition, collapse = ", ",  parens = FALSE))}
     if (!is.null(order)) {
-      order = build_sql("ORDER BY ", sql_vector(order, collapse = ", ", parens = FALSE))
-    }
+      order = build_sql("ORDER BY ", sql_vector(order, collapse = ", ", parens = FALSE))}
     if (!is.null(frame)) {
       if (is.numeric(frame))
         frame = rows(frame[1], frame[2])
-      frame = build_sql("ROWS ", frame)
-    }
-    over = sql_vector(compact(list(partition, order, frame)),
-                       parens = TRUE)
-    build_sql(expr, " OVER ", over)
-  }
+      frame = build_sql("ROWS ", frame) }
+    over =
+      sql_vector(
+        compact(list(partition, order, frame)),
+        parens = TRUE)
+    build_sql(expr, " OVER ", over)}
 
 environment (over) = environment(select_)
-
 
 
 .onLoad = function(._,.__) {
