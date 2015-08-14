@@ -75,11 +75,12 @@ df1 %>% inner_join(df2, by = "x") %>% nrow()
 #returns NA
 df1 %>% semi_join(df2, by = "x") %>% nrow()
 
+#need better examples here
 intersect(df1, df2)
 union(df1, df2)
 #setdiff(df1, df2)
 #setdiff(df2, df1)
 
-full_join(df1, df2) %>% str()
+full_join(df1, df2)
 
 
