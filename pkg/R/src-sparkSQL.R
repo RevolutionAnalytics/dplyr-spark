@@ -16,7 +16,7 @@ src_SparkSQL =
   function(
     host =
       detect(
-        c(Sys.getenv("HIVE_SERVER2_THRIFT_BIND_HOST"),"localhost"),
+        c(Sys.getenv("HIVE_SERVER2_THRIFT_BIND_HOST"), "localhost"),
         ~.!=""),
     port =
       detect(
