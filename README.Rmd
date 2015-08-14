@@ -57,26 +57,24 @@ library(rJava)
 
 This is only a test, in general you don't need it before loading `dplyr.spark`.
 
+----------------
 
-<style type="text/css">
-<!--
-.tab { margin-left: 5%; }
--->
-</style>
-<div class="tab">
 #### Mac Digression
 
 On the mac this required two different versions of java installed, [for real](http://andrewgoldstone.com/blog/2015/02/03/rjava/), and in particular this shell variable set
-<pre>
+```
 DYLD_FALLBACK_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/server/
-</pre>
+```
 The specific path may be different, particularly the version numbers. To start Rstudio (optional, you can use a different GUI or none at all), which doesn't read environment variables, you can enter the following command:
-<pre>
+```
 DYLD_FALLBACK_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/server/ open -a rstudio
-</pre>
-</div>
+```
+----------------
 
 The `HADOOP_JAR` environment variable needs to be set to the main hadoop JAR file, something like `"<spark home>/assembly/target/scala-2.10/spark-assembly-1.4.0-SNAPSHOT-hadoop2.6.0.jar"` 
+
+Two more variables whose contents are used as defaults when creating a `src` for this backend are
+`HIVE_SERVER2_THRIFT_BIND_HOST`, the address of the host running the thrift server, and `HIVE_SERVER2_THRIFT_PORT`, the port on which the thift server is accepting connections. If you don't specify these variables, the default values are `"localhost"` and `10000` respectively. They can also be provided as arguments to `src_SparkSQL`.
 
 To install, first install and load `devtools`
 
