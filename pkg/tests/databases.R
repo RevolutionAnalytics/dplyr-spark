@@ -13,6 +13,7 @@ library(nycflights13)
 flights = copy_to(my_db, flights, temporary = TRUE)
 flights = tbl(my_db, "flights")
 flights
+cache(flights)
 
 tbl(my_db, sql("SELECT * FROM flights"))
 

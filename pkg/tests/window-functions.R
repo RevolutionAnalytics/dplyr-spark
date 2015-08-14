@@ -7,7 +7,8 @@ batting = tbl(my_db, "batting")
 batting <- select(batting, playerid, yearid, teamid, g, ab:h)
 batting <- arrange(batting, playerid, yearid, teamid)
 players <- group_by(batting, playerid)
-
+cache(batting)
+cache(players)
 # For each player, find the two years with most hits
 filter(players, min_rank(desc(h)) <= 2 & h > 0)
 # Within each player, rank each year by the number of games played
