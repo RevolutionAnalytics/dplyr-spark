@@ -60,6 +60,14 @@ mutate_.tbl_SparkSQL =
     else {
       new}}
 
+filter_.tbl_SparkSQL =
+  function (.data, ..., .dots)   {
+    dots <- lazyeval::all_dots(.dots, ...)
+    input <- partial_eval(dots, .data)
+    if(!is.null(names(.data$select)))
+      .data = collapse(.data)
+    update(.data, where = c(.data$where, input))}
+
 assert.compatible =
   function(x, y)
     if(suppressWarnings(!all(colnames(x) == colnames(y))))
@@ -100,6 +108,6 @@ full_join.tbl_SparkSQL =
   function (x, y, by = NULL, copy = FALSE, auto_index = FALSE, ...) {
     some_join(x = x, y = y, by = by, copy = copy, auto_index = auto_index, ..., type = "full")}
 
-refresh.tbl_SparkSQL =
+refresh.tbl_sql =
   function(x, src = refresh(x$src)) {
     tbl(src, x$query$sql)}
