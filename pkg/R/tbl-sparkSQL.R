@@ -64,7 +64,10 @@ filter_.tbl_SparkSQL =
   function (.data, ..., .dots)   {
     dots <- lazyeval::all_dots(.dots, ...)
     input <- partial_eval(dots, .data)
-    if(!is.null(names(.data$select)))
+    if(
+      any(
+        names(.data$select) %in%
+        flatten(all.vars(input[[1]]))))
       .data = collapse(.data)
     update(.data, where = c(.data$where, input))}
 
