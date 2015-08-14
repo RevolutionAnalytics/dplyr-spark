@@ -13,7 +13,16 @@
 # limitations under the License.
 
 src_SparkSQL =
-  function(host = "localhost", port = 10000) {
+  function(
+    host =
+      detect(
+        c(Sys.getenv("HIVE_SERVER2_THRIFT_BIND_HOST"),"localhost"),
+        ~.!=""),
+    port =
+      detect(
+        c(
+          Sys.getenv("HIVE_SERVER2_THRIFT_PORT"), 10000),
+        ~.!="")) {
     driverclass = "org.apache.hive.jdbc.HiveDriver"
     dr = JDBC(driverclass, Sys.getenv("HADOOP_JAR"))
     con =
