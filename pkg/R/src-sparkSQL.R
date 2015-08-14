@@ -375,6 +375,16 @@ sql_semi_join.SparkSQLConnection =
     attr(from, "vars") = x$select
     from}
 
+refresh = function(x, ...) UseMethod("refresh")
+
+refresh.tbl_SparkSQL =
+  function(x, src = refresh(x$src)) {
+    tbl(src, x$query$sql)}
+
+refresh.src_SparkSQL =
+  function(x)
+    do.call(src_SparkSQL, x$info)
+
 over  =
   function (expr, partition = NULL, order = NULL, frame = NULL)  {
     args = (!is.null(partition)) + (!is.null(order)) + (!is.null(frame))
