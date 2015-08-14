@@ -111,3 +111,8 @@ full_join.tbl_SparkSQL =
 refresh.tbl_sql =
   function(x, src = refresh(x$src)) {
     tbl(src, x$query$sql)}
+
+cache =
+  function(tbl) {
+    DBI::dbSendQuery(my_db$con, paste("CACHE TABLE", tbl$from))
+    tbl}
