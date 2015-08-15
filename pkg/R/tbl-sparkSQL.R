@@ -60,6 +60,20 @@ mutate_.tbl_SparkSQL =
     else {
       new}}
 
+#modeled after transmite_ methods in http://github.com/hadley/dplyr,
+#under MIT license
+transmute_.tbl_SparkSQL =
+  function (.data, ..., .dots)
+{
+  dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
+  tempnames = paste0(names(dots), "____")
+  oldnames = names(dots)
+  names(dots) = tempnames
+  out <- mutate_(.data, .dots = dots)
+  keep <- names(dots)
+  rename_(select(out, one_of(keep)), .dots = setNames(tempnames, oldnames))
+}
+
 filter_.tbl_SparkSQL =
   function (.data, ..., .dots)   {
     dots <- lazyeval::all_dots(.dots, ...)
