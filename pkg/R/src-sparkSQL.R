@@ -22,9 +22,20 @@ src_SparkSQL =
       detect(
         c(
           Sys.getenv("HIVE_SERVER2_THRIFT_PORT"), 10000),
-        ~.!="")) {
+        ~.!=""),
+    start.server = TRUE,
+    server.options = NULL) {
+    if(start.server) {
+      server.options =
+        paste0(
+          ifelse(nchar(server.options) == 1, "-", "--"),
+          server.options,
+          collapse = " ")
+      if(system(paste0(Sys.getenv("SPARK_HOME"), "/sbin/start-thriftserver.sh", server.options)) != 0)
+        stop("Couldn't start thrift server")}
     driverclass = "org.apache.hive.jdbc.HiveDriver"
     dr = JDBC(driverclass, Sys.getenv("HADOOP_JAR"))
+    Sys.sleep(10)
     con =
       dbConnect(
         drv = dr,
