@@ -29,12 +29,7 @@ src_SparkSQL =
       dbConnect(
         drv = dr,
         url = paste0("jdbc:hive2://", host, ":", port))
-    tmptables = new.env()
-    reg.finalizer(
-      tmptables,
-      function(en)
-        sapply(ls(en), function(x) db_drop_table(con, x)))
-    con = new("SparkSQLConnection", con, tmptables = tmptables )
+    con = new("SparkSQLConnection", con)
     src_sql(
       "SparkSQL",
       con,

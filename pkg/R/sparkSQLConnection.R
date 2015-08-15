@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 setClass(
   "SparkSQLConnection",
-  slots = list(tmptables = "environment"),
   contains = "JDBCConnection")
 
 db_list_tables.SparkSQLConnection =
@@ -98,15 +96,13 @@ db_create_index.SparkSQLConnection =
 db_create_table.SparkSQLConnection =
   function(con, table, types, temporary = TRUE, ...) {
     table = tolower(table)
-    if(temporary) con@tmptables[[table]] = TRUE
-    temporary = FALSE
     NextMethod()}
 
 db_save_query.SparkSQLConnection =
   function(con, sql, name, temporary = TRUE, ...){
     name = tolower(name)
-    if(temporary) con@tmptables[[name]] = TRUE
-    temporary = FALSE
+    if(temporary)
+      stop("Compute into temporary not supported yet. Set temporary = FALSE")
     NextMethod()}
 
 db_explain.SparkSQLConnection =
