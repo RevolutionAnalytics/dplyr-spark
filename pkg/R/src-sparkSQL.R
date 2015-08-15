@@ -73,7 +73,7 @@ copy_to.src_SparkSQL =
   function(dest, df, name =  dedot(deparse(substitute(df))), ...) {
     force(name)
     names(df) = dedot(names(df))
-    NextMethod(name = name)}
+    NextMethod()}
 
 tbl.src_SparkSQL =
   function(src, from, ...){
