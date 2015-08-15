@@ -76,8 +76,12 @@ copy_to.src_SparkSQL =
     NextMethod(name = name)}
 
 tbl.src_SparkSQL =
-  function(src, from, ...)
-    tbl_sql("SparkSQL", src = src, from = tolower(from), ...)
+  function(src, from, ...){
+    tbl_sql(
+      "SparkSQL",
+      src = src,
+      from = if(is.sql(from)) from else tolower(from),
+      ...)}
 
 refresh = function(x, ...) UseMethod("refresh")
 
