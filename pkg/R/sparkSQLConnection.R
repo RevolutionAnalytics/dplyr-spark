@@ -96,14 +96,14 @@ db_create_index.SparkSQLConnection =
 db_create_table.SparkSQLConnection =
   function(con, table, types, temporary = TRUE, ...) {
     table = tolower(table)
-    NextMethod()}
+    dplyr:::db_create_table.DBIConnection(con, table, types, temporary, ...)}
 
 db_save_query.SparkSQLConnection =
   function(con, sql, name, temporary = TRUE, ...){
     name = tolower(name)
     if(temporary)
       stop("Compute into temporary not supported yet. Set temporary = FALSE")
-    NextMethod()}
+    dplyr:::db_save_query.DBIConnection(con, sql, name, temporary, ...)}
 
 db_explain.SparkSQLConnection =
   function(con, sql, ...)

@@ -36,7 +36,7 @@ convert.from.DB =
 collect.tbl_SparkSQL =
   function(x, ...) {
     x = compute(x, temporary = FALSE)
-    res = NextMethod(x = x)
+    res = dplyr:::collect.tbl_sql(x, ...)
     db.types =
       DBI::dbGetQuery(x$src$con, paste("describe", x$from))$data_type
     db_drop_table(table = paste0('`', x$from,'`'), con = x$src$con)
