@@ -35,7 +35,7 @@ convert.from.DB =
 
 collect.tbl_SparkSQL =
   function(x, ...) {
-    x = compute(x)
+    x = compute(x, temporary = FALSE)
     res = NextMethod(x = x)
     db.types =
       DBI::dbGetQuery(x$src$con, paste("describe", x$from))$data_type
