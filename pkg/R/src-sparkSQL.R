@@ -12,40 +12,67 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+start.server =
+  function(
+    spark.home = Sys.getenv("SPARK_HOME"),
+    opts = NULL,
+    work.dir = getwd()){
+    opts =
+      paste0(
+        paste0(
+          ifelse(nchar(names(opts)) == 1, "-", "--"),
+          names(opts),
+          " ",
+          map(opts,  ~if(is.null(.)) "" else .)),
+        collapse = " ")
+    server.cmd =
+      paste0(
+        "cd ", work.dir, ";",
+        spark.home, "/sbin/start-thriftserver.sh", opts)
+    retval = system(server.cmd, intern = TRUE)
+    if(!is.null(attr(retval, "status")))
+      stop("Couldn't start thrift server:", retval)}
+
+stop.server =
+  function(spark.home = Sys.getenv("SPARK_HOME")){
+    system(
+      paste0(
+        spark.home,
+        "/sbin/stop-thriftserver.sh"))}
+
+first.not.empty =
+  function(...)
+    detect(list(...), ~.!="")
 
 src_SparkSQL =
   function(
     host =
-      detect(
-        c(Sys.getenv("HIVE_SERVER2_THRIFT_BIND_HOST"), "localhost"),
-        ~.!=""),
+      first.not.empty(
+        Sys.getenv("HIVE_SERVER2_THRIFT_BIND_HOST"),
+        "localhost"),
     port =
-      detect(
-        c(
-          Sys.getenv("HIVE_SERVER2_THRIFT_PORT"), 10000),
-        ~.!=""),
-    start.server = TRUE,
-    server.options = NULL) {
-    if(start.server) {
-      server.options =
-        paste0(
-          ifelse(nchar(server.options) == 1, "-", "--"),
-          server.options,
-          collapse = " ")
-      if(system(paste0(Sys.getenv("SPARK_HOME"), "/sbin/start-thriftserver.sh", server.options)) != 0)
-        stop("Couldn't start thrift server")
+      first.not.empty(
+        Sys.getenv("HIVE_SERVER2_THRIFT_PORT"),
+        10000),
+    start.server = TRUE) {
+    if(!identical(start.server, FALSE)) {
+      do.call(
+        "start.server",
+        if(is.logical(start.server))
+          list()
+        else
+          start.server)
       final.env = new.env()
       reg.finalizer(
         final.env,
         function(e) {
-          system(
-            paste0(
-              Sys.getenv("SPARK_HOME"),
-              "/sbin/stop-thriftserver.sh"))},
-        onexit = TRUE)}
+          do.call(
+            stop.server,
+            as.list(as.list(start.server)$spark.home))},
+        onexit = TRUE)
+      Sys.sleep(10)}
     driverclass = "org.apache.hive.jdbc.HiveDriver"
     dr = JDBC(driverclass, Sys.getenv("HADOOP_JAR"))
-    Sys.sleep(10)
     con =
       dbConnect(
         drv = dr,
