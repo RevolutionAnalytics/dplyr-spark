@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 src_SparkSQL =
   function(
     host =
@@ -32,7 +33,16 @@ src_SparkSQL =
           server.options,
           collapse = " ")
       if(system(paste0(Sys.getenv("SPARK_HOME"), "/sbin/start-thriftserver.sh", server.options)) != 0)
-        stop("Couldn't start thrift server")}
+        stop("Couldn't start thrift server")
+      final.env = new.env()
+      reg.finalizer(
+        final.env,
+        function(e) {
+          system(
+            paste0(
+              Sys.getenv("SPARK_HOME"),
+              "/sbin/stop-thriftserver.sh"))},
+        onexit = TRUE)}
     driverclass = "org.apache.hive.jdbc.HiveDriver"
     dr = JDBC(driverclass, Sys.getenv("HADOOP_JAR"))
     Sys.sleep(10)
@@ -44,7 +54,7 @@ src_SparkSQL =
     src_sql(
       "SparkSQL",
       con,
-      info = mget(names(formals()), sys.frame(sys.nframe())))}
+      info = list(host = host, port = port, env = final.env))}
 
 src_desc.src_SparkSQL =
   function(x) {
