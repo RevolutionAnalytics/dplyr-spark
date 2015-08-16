@@ -6,3 +6,4 @@ derby.log
 dplyr.spark.Rproj
 README.html
 dplyr.spark_*.tar.gz
+*.html
