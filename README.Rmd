@@ -9,43 +9,32 @@ opts_chunk$set(echo=TRUE, eval=TRUE, tidy=FALSE, comment="", cache=FALSE, error=
 ```
 
 
-# BETA QUALITY. KICK TIRES WITH CARE. NOT FOR PRODUCTION. FEEDBACK APPRECIATED
-
 # dplyr.spark
 
-
-This package adds a spark src for the dplyr package
+This package implements a [`spark`](http://spark.apache.org/) backend for the `dplyr` package, providing a powerful and intuitive DSL to manipulate large datasets on a powerful big data platform.  It is a simple package: simple to learn if you have any familiarity with `dplyr` or even just R and SQL, simple to deploy: just a few packages to install on a single machine, as long as your Spark installation comes with JDBC support -- or build it in, instructions below.
+The current state of the project is:
+ - most `dplyr` features supported
+ - adds some `spark`-specific goodies, like *caching* table.
+ - can go succesfully through tutorials for `dplyr` like any other database backend. 
+ - not yet endowed with a thorugh test suite. Nonetheless we expect it to inherit much of its correctness, scalability and robustness from its main dependencies, `dplyr` and `spark`.
+ - we don't recommend production use yet
 
 ## Installation
 
 You need to [download spark](https://spark.apache.org/downloads.html) and [build it](https://spark.apache.org/docs/latest/building-spark.html) as follows
-
 
 ```
 cd <spark root>
 build/mvn -Pyarn -Phadoop-2.4 -Dhadoop.version=2.4.0 -DskipTests -Phive -Phive-thriftserver clean package
 ```
 
-It may work with other versions, but we need the hive and hive-thriftserver support. Then start the thift service.
-
-```
-sbin/start-thriftserver.sh  
-
-```
-
-I've had to tamper with some memory options. Unless you see an out-of-memory error, you probably don't need them, but if you do here's how I start it:
-
-
-```
-sbin/start-thriftserver.sh  --driver-memory 1G --executor-memory 2G
-
-```
+It may work with other hadoop versions, but we need the hive and hive-thriftserver support. The package is able to start the thirft server but can also connect to a running one.
 
 `dplyr.spark` has a few dependencies: get them with
 
 ```
 install.packages(c("RJDBC", "dplyr", "DBI", "devtools"))
-devtools::install_github("hadley/purrr") #soon to be on CRAN, then we don't need devtools
+devtools::install_github("hadley/purrr")
 ```
 
 Indirectly `RJDBC` needs `rJava`. Make sure that you have `rJava` working with:
@@ -61,7 +50,8 @@ This is only a test, in general you don't need it before loading `dplyr.spark`.
 
 #### Mac Digression
 
-On the mac this required two different versions of java installed, [for real](http://andrewgoldstone.com/blog/2015/02/03/rjava/), and in particular this shell variable set
+On the mac `rJava` required two different versions of java installed, [for real](http://andrewgoldstone.com/blog/2015/02/03/rjava/), and in particular this shell variable set
+
 ```
 DYLD_FALLBACK_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/server/
 ```
@@ -73,15 +63,8 @@ DYLD_FALLBACK_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Con
 
 The `HADOOP_JAR` environment variable needs to be set to the main hadoop JAR file, something like `"<spark home>/assembly/target/scala-2.10/spark-assembly-1.4.0-SNAPSHOT-hadoop2.6.0.jar"` 
 
-Two more variables whose contents are used as defaults when creating a `src` for this backend are
-`HIVE_SERVER2_THRIFT_BIND_HOST`, the address of the host running the thrift server, and `HIVE_SERVER2_THRIFT_PORT`, the port on which the thift server is accepting connections. If you don't specify these variables, the default values are `"localhost"` and `10000` respectively. They can also be provided as arguments to `src_SparkSQL`.
+To start the thrift server from R, which happens by default when creating a `src_SparkSQL` object, you need one more variable set, `SPARK_HOME`, as the name suggests pointing to the root of the Spark installation. If you are connecting with a running server, you just need host and port information. Those can be stored in environment variable as well, see help documentation.
 
-To install, first install and load `devtools`
-
-```{r eval=FALSE}
-install.packages("devtools")
-library(devtools)
-```
 
 ```{r, echo=FALSE}
 library(httr)
@@ -92,7 +75,7 @@ Then, to install from source:
 
 ```{r, echo=FALSE, comment=""}
 cat(
-  paste0('install_github("RevolutionAnalytics/dplyr-spark@', version, '", subdir = "pkg")
+  paste0('devtools::install_github("RevolutionAnalytics/dplyr-spark@', version, '", subdir = "pkg")
 '))
 ```
 
@@ -100,7 +83,7 @@ Linux package:
 
 ```{r, echo=FALSE, comment=""}
 cat(
-  paste0('install_url(
+  paste0('devtools::install_url(
   "https://github.com/RevolutionAnalytics/dplyr-spark/releases/download/', version, '/dplyr.spark_', version, '.tar.gz")
 '))
 ```
@@ -123,15 +106,7 @@ cat(
 cat("The current version is", version, ".")
 ```
 
-
-```{r, eval = FALSE}
-library(dplyr)
-library(dplyr.spark)
-
-spark.src = src_SparkSQL("localhost", "10000")
-```
-
-
+You can find a number of examples derived from @hadley's own tutorials for dplyr look under the [test](https://github.com/RevolutionAnalytics/dplyr-spark/tree/master/pkg/tests) directory, files `databases.R`, `window-functions.R` and `two-table.R`.
 
 For new releases, subscribe to `dplyr-spark`'s Release notes [feed](https://github.com/RevolutionAnalytics/dplyr.spark/releases.atom) or join the [RHadoop Google group](https://groups.google.com/forum/#!forum/rhadoop). The latter is also the best place to get support, together with the [issue tracker](http://github.com/RevolutionAnalytics/dplyr.spark/issues))
 
