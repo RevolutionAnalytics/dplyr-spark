@@ -126,7 +126,7 @@ copy_to.src_SparkSQL =
     if(!all(names(df) == dedot(names(df))))
       warning("Replacing dot with _ in col names to appease spark")
     names(df) = dedot(names(df))
-    dplyr:::copy_to.src_sql(dest, df, name, name, ...)}
+    dplyr:::copy_to.src_sql(dest, df, name, ...)}
 
 tbl.src_SparkSQL =
   function(src, from, ...){
