@@ -24,8 +24,11 @@ Sys.setenv(
 my_db = src_SparkSQL()
 
 library(nycflights13)
-flights = copy_to(my_db, flights, temporary = TRUE)
-flights = tbl(my_db, "flights")
+flights = {
+  if(db_has_table(my_db$con, "flights"))
+    tbl(my_db, "flights")
+  else
+    copy_to(my_db, flights, temporary = TRUE)}
 flights
 cache(flights)
 
@@ -45,11 +48,13 @@ c4 = arrange(c3, year, month, day, carrier)
 
 c4
 
-collect(c4)
-
+collect(c4, name = "c4", temporary = FALSE)
 c4$query
 
 explain(c4)
+
+db_drop_table(my_db$con, "c4")
+
 
 by_tailnum = group_by(flights, tailnum)
 delay = summarise(by_tailnum,
