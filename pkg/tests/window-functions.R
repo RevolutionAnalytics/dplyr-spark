@@ -12,6 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# derivative of dplyr introductory material, http://github.com/hadley/dplyr
+# presumably under MIT licenselibrary(dplyr)
+
+library(dplyr)
+library(dplyr.spark)
+Sys.setenv(
+  HADOOP_JAR = "../spark/assembly/target/scala-2.10/spark-assembly-1.5.0-SNAPSHOT-hadoop2.4.0.jar",
+  SPARK_HOME = "../spark")
+
+my_db = src_SparkSQL()
 
 
 library(Lahman)
