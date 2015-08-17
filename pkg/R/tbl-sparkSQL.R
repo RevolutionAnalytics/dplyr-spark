@@ -64,8 +64,8 @@ mutate_.tbl_SparkSQL =
 
 filter_.tbl_SparkSQL =
   function (.data, ..., .dots)   {
-    dots <- lazyeval::all_dots(.dots, ...)
-    input <- partial_eval(dots, .data)
+    dots = lazyeval::all_dots(.dots, ...)
+    input = partial_eval(dots, .data)
     if(
       any(
         names(.data$select) %in%
