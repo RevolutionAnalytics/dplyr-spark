@@ -35,11 +35,11 @@ convert.from.DB =
 
 collect.tbl_SparkSQL =
   function(x, ...) {
-    x = compute(x, temporary = FALSE)
+    xs = compute(suppressMessages(top_n(x, 1)), temporary = FALSE)
     res = dplyr:::collect.tbl_sql(x, ...)
     db.types =
-      DBI::dbGetQuery(x$src$con, paste("describe", x$from))$data_type
-    db_drop_table(table = paste0('`', x$from,'`'), con = x$src$con)
+      DBI::dbGetQuery(xs$src$con, paste("describe", xs$from))$data_type
+    db_drop_table(table = paste0('`', xs$from,'`'), con = xs$src$con)
     sapply(
       seq_along(res),
       function(i)
