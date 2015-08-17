@@ -32,8 +32,6 @@ flights = {
 flights
 cache(flights)
 
-tbl(my_db, sql("SELECT * FROM flights"))
-
 ## ------------------------------------------------------------------------
 select(flights, year:day, dep_delay, arr_delay)
 filter(flights, dep_delay > 240)
