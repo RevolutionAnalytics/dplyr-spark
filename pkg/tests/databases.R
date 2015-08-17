@@ -142,7 +142,6 @@ summarise(
   planes = n_distinct(tailnum),
   flights = n())
 
-daily = group_by(flights, year, month, day)
 (per_day   = summarise(daily, flights = n()))
 (per_month = summarise(per_day, flights = sum(flights)))
 (per_year  = summarise(per_month, flights = sum(flights)))
