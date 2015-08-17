@@ -28,7 +28,7 @@ flights = {
   if(db_has_table(my_db$con, "flights"))
     tbl(my_db, "flights")
   else
-    copy_to(my_db, flights, temporary = TRUE)}
+    copy_to(my_db, flights, temporary = FALSE)}
 flights
 cache(flights)
 
