@@ -166,7 +166,7 @@ a4
 filter(
   summarise(
     select(
-      group_by(flights, year, month, day),
+      daily,
       arr_delay, dep_delay),
     arr = mean(arr_delay),
     dep = mean(dep_delay)),
