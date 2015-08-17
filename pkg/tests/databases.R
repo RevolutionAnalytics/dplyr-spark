@@ -118,12 +118,16 @@ summarise(
 # sample_n(flights, 10)
 # sample_frac(flights, 0.01)
 
+
+
 by_tailnum = group_by(flights, tailnum)
 delay = summarise(by_tailnum,
-                   count = n(),
-                   dist = mean(distance),
-                   delay = mean(arr_delay))
+                  count = n(),
+                  dist = mean(distance),
+                  delay = mean(arr_delay))
 delay = filter(delay, count > 20, dist < 2000)
+delay_local = collect(delay)
+delay_local
 
 ggplot(
   collect(delay),
