@@ -86,10 +86,14 @@ src_SparkSQL =
     dr = JDBC(driverclass, Sys.getenv("HADOOP_JAR"))
     url = paste0("jdbc:hive2://", host, ":", port)
     con = new("SparkSQLConnection", dbConnect_retry(dr, url, 100))
+    pf = parent.frame()
     src_sql(
       "SparkSQL",
       con,
-      info = list(host = host, port = port, env = final.env))}
+      info = list("Spark at", host = host, port = port),
+      env = final.env,
+      call = match.call(),
+      calling.env = pf)}
 
 src_desc.src_SparkSQL =
   function(x) {
@@ -147,6 +151,8 @@ tbl.src_SparkSQL =
 refresh = function(x, ...) UseMethod("refresh")
 
 refresh.src_SparkSQL =
-  function(x)
-    do.call(src_SparkSQL, x$info)
+  function(x){
+    if(!identical(x$call$start.server, FALSE))
+      stop.server()
+    eval(x$call, envir = x$calling.env)}
 
