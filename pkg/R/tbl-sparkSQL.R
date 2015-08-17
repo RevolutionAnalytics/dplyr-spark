@@ -52,7 +52,8 @@ mutate_.tbl_SparkSQL =
   function (.data, ..., .dots) {
     dots = lazyeval::all_dots(.dots, ..., all_named = TRUE)
     input = partial_eval(dots, .data)
-    input = lapply(input, function(x) partial_eval(x, .data, input))
+    for(i in 1:length(input))
+      input = lapply(input, function(x) partial_eval(x, .data, input))
     .data$mutate = TRUE
     no.dup.select = .data$select[!as.character(.data$select) %in% names(input)]
     new = update(.data, select = c(no.dup.select, input))
