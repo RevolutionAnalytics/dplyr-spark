@@ -54,16 +54,6 @@ explain(c4)
 db_drop_table(my_db$con, "c4")
 
 
-by_tailnum = group_by(flights, tailnum)
-delay = summarise(by_tailnum,
-  count = n(),
-  dist = mean(distance),
-  delay = mean(arr_delay))
-delay = filter(delay, count > 20, dist < 2000)
-delay_local = collect(delay)
-delay_local
-
-
 daily = group_by(flights, year, month, day)
 
 bestworst = daily %>%
