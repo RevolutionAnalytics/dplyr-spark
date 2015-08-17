@@ -54,25 +54,13 @@ mutate_.tbl_SparkSQL =
     input = partial_eval(dots, .data)
     input = lapply(input, function(x) partial_eval(x, .data, input))
     .data$mutate = TRUE
-    new = update(.data, select = c(.data$select, input))
+    no.dup.select = .data$select[!as.character(.data$select) %in% names(input)]
+    new = update(.data, select = c(no.dup.select, input))
     if (dplyr:::uses_window_fun(input, .data)) {
       collapse(new) }
     else {
       new}}
 
-#modeled after transmite_ methods in http://github.com/hadley/dplyr,
-#under MIT license
-transmute_.tbl_SparkSQL =
-  function (.data, ..., .dots)
-{
-  dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
-  tempnames = paste0(names(dots), "____")
-  oldnames = names(dots)
-  names(dots) = tempnames
-  out <- mutate_(.data, .dots = dots)
-  keep <- names(dots)
-  rename_(select(out, one_of(keep)), .dots = setNames(tempnames, oldnames))
-}
 
 filter_.tbl_SparkSQL =
   function (.data, ..., .dots)   {
