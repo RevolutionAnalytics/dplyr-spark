@@ -17,29 +17,27 @@ src_SparkSQL(
     first.not.empty(
       Sys.getenv("HIVE_SERVER2_THRIFT_PORT"),
       10000),
-  start.server = TRUE)
+  start.server = !is.server.running(),
+  server.opts = list())
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{host}{
  The address of the host running the thift server (see Details)
 }
-  \item{port}{
- The port on which the thirft server is listening
+  \item{port}{ The port on which the thirft server is listening}
+ \item{start.server}{Whether to start the Spark thrift server, defaults to using one if already running, starting one otherwise.}
+ \item{server.opts}{Server options, as a named list, will be added to command to start the Spark thrift server, see \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#running-the-thrift-jdbcodbc-server}}
 }
 
-}
 \details{
-You need to have the hive-thiftserver running, see \url{https://spark.apache.org/docs/latest/sql-programming-guide.html}
+If you already have a thrift server running (see \url{https://spark.apache.org/docs/latest/sql-programming-guide.html}) you can set \code{start.server} to \code{NULL}. When \code{start.server} this function will try to guess if a server is already running, but that will work only if the server is local to the machine on which R is running.
 }
 \value{
-An object of class \code{src_SparkSQL}. Use it like any other src in dplyr/
+An object of class \code{src_SparkSQL}. Use it like any other src of the SQL variety in dplyr.
 }
-\author{
-Revolution Analytics}
 
 
 \examples{
-   #See the \code{dplyr} tutorial. Limitations are documented at
-   #http://github.com/RevolutionAnalytics/dplyr-spark/issues/3
+   #See the \code{dplyr} tutorial.
 }
