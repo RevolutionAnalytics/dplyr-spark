@@ -170,21 +170,21 @@ sql_semi_join.SparkSQLConnection =
   function (con, x, y, anti = FALSE, by = NULL, ...){
     if(anti) stop("antijoins not implemented yet")
     by = dplyr:::common_by(by, x, y)
-    left = dplyr:::escape(ident("_LEFT"), con = con)
-    right = dplyr:::escape(ident("_RIGHT"), con = con)
+    left = dplyr::escape(ident("_LEFT"), con = con)
+    right = dplyr::escape(ident("_RIGHT"), con = con)
     on =
       dplyr:::sql_vector(
         paste0(
-          left, ".", dplyr:::sql_escape_ident(con, by$x), " = ",
-          right, ".", dplyr:::sql_escape_ident(con, by$y)),
+          left, ".", dplyr::sql_escape_ident(con, by$x), " = ",
+          right, ".", dplyr::sql_escape_ident(con, by$y)),
         collapse = " AND ",
         parens = TRUE)
     from =
       dplyr::build_sql(
         "SELECT * FROM ",
-        dplyr:::sql_subquery(con, x$query$sql, "_LEFT"), "\n",
+        dplyr::sql_subquery(con, x$query$sql, "_LEFT"), "\n",
         "LEFT SEMI JOIN ",
-        dplyr:::sql_subquery(con, y$query$sql, "_RIGHT"), "\n",
+        dplyr::sql_subquery(con, y$query$sql, "_RIGHT"), "\n",
         "  ON ", on)
     attr(from, "vars") = x$select
     from}

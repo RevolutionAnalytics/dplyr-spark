@@ -50,7 +50,7 @@ collect.tbl_SparkSQL =
 #under MIT license
 mutate_.tbl_SparkSQL =
   function (.data, ..., .dots) {
-    dots = lazyeval::all_dots(.dots, ..., all_named = TRUE)
+    dots = all_dots(.dots, ..., all_named = TRUE)
     input = partial_eval(dots, .data)
     for(i in 1:length(input))
       input = lapply(input, function(x) partial_eval(x, .data, input))
@@ -65,7 +65,7 @@ mutate_.tbl_SparkSQL =
 
 filter_.tbl_SparkSQL =
   function (.data, ..., .dots)   {
-    dots = lazyeval::all_dots(.dots, ...)
+    dots = all_dots(.dots, ...)
     input = partial_eval(dots, .data)
     if(
       any(
@@ -103,7 +103,7 @@ some_join =
     by = dplyr:::common_by(by, x, y)
     y = dplyr:::auto_copy(x, y, copy, indexes = if (auto_index)
       list(by$y))
-    sql = dplyr:::sql_join(x$src$con, x, y, type = type, by = by)
+    sql = dplyr::sql_join(x$src$con, x, y, type = type, by = by)
     dplyr:::update.tbl_sql(tbl(x$src, sql), group_by = groups(x))}
 
 right_join.tbl_SparkSQL =

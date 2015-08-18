@@ -105,7 +105,7 @@ make.win.fun =
     function(x) {
       dplyr:::over(
         dplyr::build_sql(
-          dplyr:::sql(f),
+          dplyr::sql(f),
           list(x)),
         dplyr:::partition_group(),
         NULL,
