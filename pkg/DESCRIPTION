@@ -8,5 +8,5 @@ Maintainer: Revolution Analytics <rhadoop@revolutionanalytics.com>
 Description: Add a spark data source for dplyr.
 URL: https://github.com/RevolutionAnalytics/dplyr-spark
 License: Apache License(== 2.0)
-Imports: RJDBC, dplyr, DBI, purrr
-Suggests: Lahman, ggplot2, nycflights13
+Imports: RJDBC, dplyr, DBI, purrr, lazyeval
+Suggests: Lahman, ggplot2, nycflights13, quickcheck
