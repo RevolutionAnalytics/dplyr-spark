@@ -151,7 +151,7 @@ tbl.src_SparkSQL =
 refresh = function(x, ...) UseMethod("refresh")
 
 refresh.src_SparkSQL =
-  function(x){
+  function(x, ...){
     if(!identical(x$call$start.server, FALSE))
       stop.server()
     eval(x$call, envir = x$calling.env)}

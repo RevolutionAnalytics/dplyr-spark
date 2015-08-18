@@ -115,7 +115,7 @@ full_join.tbl_SparkSQL =
     some_join(x = x, y = y, by = by, copy = copy, auto_index = auto_index, ..., type = "full")}
 
 refresh.tbl_sql =
-  function(x, src = refresh(x$src)) {
+  function(x, src = refresh(x$src), ...) {
     tbl(src, x$query$sql)}
 
 cache =
