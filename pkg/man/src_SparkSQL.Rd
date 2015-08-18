@@ -26,8 +26,8 @@ src_SparkSQL(
  The address of the host running the thift server (see Details)
 }
   \item{port}{ The port on which the thirft server is listening}
- \item{start.server}{Whether to start the Spark thrift server, defaults to using one if already running, starting one otherwise.}
- \item{server.opts}{Server options, as a named list, will be added to command to start the Spark thrift server, see \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#running-the-thrift-jdbcodbc-server}}
+  \item{start.server}{Whether to start the Spark thrift server, defaults to using one if already running, starting one otherwise.}
+  \item{server.opts}{Server options, as a named list, will be added to command to start the Spark thrift server, see \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#running-the-thrift-jdbcodbc-server}}
 }
 
 \details{
