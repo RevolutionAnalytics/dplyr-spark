@@ -37,7 +37,7 @@ over  =
 
 environment (over) = environment(select_)
 
-.onLoad = function(._,.__) {
+.onLoad = function(lib, pkg) {
   assign(
     'n_distinct',
     function(x) {
