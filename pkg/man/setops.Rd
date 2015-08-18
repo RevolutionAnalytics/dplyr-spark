@@ -20,6 +20,6 @@ union(x, y, ...)
 \item{...}{other arguments passed on to methods}
 }
 \description{
-Support for these operations is experimental and limited to \code{intersect} and \code{union}. For the generic function documentationSee \code{\link[dplyr]{setops}}
+Support for these operations is experimental and limited to \code{intersect} and \code{union}. For the generic function documentation see \code{\link[dplyr]{setops}. This entry exists primarily to appease R CMD check.}
 }
 
