@@ -148,11 +148,11 @@ tbl.src_SparkSQL =
       from = if(is.sql(from)) from else tolower(from),
       ...)}
 
-refresh = function(x, ...) UseMethod("refresh")
-
-refresh.src_SparkSQL =
-  function(x, ...){
-    if(!identical(x$call$start.server, FALSE))
-      stop.server()
-    eval(x$call, envir = x$calling.env)}
+# refresh = function(x, ...) UseMethod("refresh")
+#
+# refresh.src_SparkSQL =
+#   function(x, ...){
+#     if(!identical(x$call$start.server, FALSE))
+#       stop.server()
+#     eval(x$call, envir = x$calling.env)}
 

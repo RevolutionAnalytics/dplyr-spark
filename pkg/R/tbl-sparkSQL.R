@@ -114,9 +114,9 @@ full_join.tbl_SparkSQL =
   function (x, y, by = NULL, copy = FALSE, auto_index = FALSE, ...) {
     some_join(x = x, y = y, by = by, copy = copy, auto_index = auto_index, ..., type = "full")}
 
-refresh.tbl_sql =
-  function(x, src = refresh(x$src), ...) {
-    tbl(src, x$query$sql)}
+# refresh.tbl_sql =
+#   function(x, src = refresh(x$src), ...) {
+#     tbl(src, x$query$sql)}
 
 cache =
   function(tbl) {
