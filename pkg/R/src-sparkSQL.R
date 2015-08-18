@@ -40,6 +40,10 @@ stop.server =
         spark.home,
         "/sbin/stop-thriftserver.sh"))}
 
+is.server.running =
+  function()
+    length(grep(system("jps", intern = TRUE) , pattern = "SparkSubmit")) > 0
+
 first.not.empty =
   function(...)
     detect(list(...), ~.!="")
@@ -65,21 +69,17 @@ src_SparkSQL =
       first.not.empty(
         Sys.getenv("HIVE_SERVER2_THRIFT_PORT"),
         10000),
-    start.server = TRUE) {
-    if(!identical(start.server, FALSE)) {
+    start.server = !is.server.running(),
+    server.opts = list()) {
+    final.env = NULL
+    if(start.server) {
       do.call(
         "start.server",
-        if(is.logical(start.server))
-          list()
-        else
-          start.server)
+        server.opts)
       final.env = new.env()
       reg.finalizer(
         final.env,
-        function(e) {
-          do.call(
-            stop.server,
-            as.list(as.list(start.server)$spark.home))},
+        function(e) {stop.server()},
         onexit = TRUE)
       }
     driverclass = "org.apache.hive.jdbc.HiveDriver"
