@@ -8,7 +8,16 @@ Create a dplyr src backed by SparkSQL
 A dplyr src backed by SparkSQL, supports most operations other databases do with the familiar dplyr syntax and semantics.
 }
 \usage{
-src_SparkSQL(host = localhost, port = 10000)
+src_SparkSQL(
+  host =
+    first.not.empty(
+      Sys.getenv("HIVE_SERVER2_THRIFT_BIND_HOST"),
+     "localhost"),
+  port =
+    first.not.empty(
+      Sys.getenv("HIVE_SERVER2_THRIFT_PORT"),
+      10000),
+  start.server = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
