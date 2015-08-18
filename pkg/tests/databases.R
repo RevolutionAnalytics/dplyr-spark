@@ -17,9 +17,6 @@
 
 library(dplyr)
 library(dplyr.spark)
-Sys.setenv(
-  HADOOP_JAR = "../spark/assembly/target/scala-2.10/spark-assembly-1.5.0-SNAPSHOT-hadoop2.4.0.jar",
-  SPARK_HOME = "../spark")
 
 my_db = src_SparkSQL()
 
