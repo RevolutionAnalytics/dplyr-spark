@@ -180,7 +180,7 @@ sql_semi_join.SparkSQLConnection =
         collapse = " AND ",
         parens = TRUE)
     from =
-      dplyr:::build_sql(
+      dplyr::build_sql(
         "SELECT * FROM ",
         dplyr:::sql_subquery(con, x$query$sql, "_LEFT"), "\n",
         "LEFT SEMI JOIN ",
