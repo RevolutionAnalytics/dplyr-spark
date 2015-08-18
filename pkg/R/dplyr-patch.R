@@ -43,7 +43,7 @@ environment (over) = environment(select_)
     function(x) {
       build_sql("COUNT(DISTINCT ", x, ")")},
     envir=base_agg)
-  assignInNamespace(
+  utils::assignInNamespace(
     x = "over",
     ns = "dplyr",
     value = over)
