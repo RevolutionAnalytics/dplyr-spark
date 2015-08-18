@@ -120,5 +120,5 @@ refresh.tbl_sql =
 
 cache =
   function(tbl) {
-    DBI::dbSendQuery(my_db$con, paste("CACHE TABLE", tbl$from))
+    DBI::dbSendQuery(tbl$src$con, paste("CACHE TABLE", tbl$from))
     tbl}
