@@ -14,9 +14,9 @@
 
 start.server =
   function(
-    spark.home = Sys.getenv("SPARK_HOME"),
     opts = NULL,
     work.dir = getwd()){
+    spark.home = Sys.getenv("SPARK_HOME")
     opts =
       paste0(
         paste0(
@@ -34,7 +34,8 @@ start.server =
       stop("Couldn't start thrift server:", retval)}
 
 stop.server =
-  function(spark.home = Sys.getenv("SPARK_HOME")){
+  function(){
+    spark.home = Sys.getenv("SPARK_HOME")
     system(
       paste0(
         spark.home,
