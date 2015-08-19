@@ -3,7 +3,7 @@
 
 # dplyr.spark
 
-This package implements a [`spark`](http://spark.apache.org/) backend for the `dplyr` package, providing a powerful and intuitive DSL to manipulate large datasets on a powerful big data platform.  It is a simple package: simple to learn if you have any familiarity with `dplyr` or even just R and SQL, simple to deploy: just a few packages to install on a single machine, as long as your Spark installation comes with JDBC support -- or build it in, instructions below.
+This package implements a [`spark`](http://spark.apache.org/) backend for the [`dplyr`](http://github.com/hadley/dplyr) package, providing a powerful and intuitive DSL to manipulate large datasets on a powerful big data platform.  It is a simple package: simple to learn if you have any familiarity with `dplyr` or even just R and SQL, simple to deploy: just a few packages to install on a single machine, as long as your Spark installation comes with JDBC support -- or build it in, instructions below.
 The current state of the project is:
 
  - most `dplyr` features supported
