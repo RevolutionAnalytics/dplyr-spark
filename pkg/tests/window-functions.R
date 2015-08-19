@@ -22,8 +22,10 @@ my_db = src_SparkSQL()
 
 
 library(Lahman)
-batting = copy_to(my_db, Batting)
-batting = tbl(my_db, "batting")
+{if(db_has_table(my_db$con, "batting"))
+  batting = tbl(my_db, "batting")
+else
+  batting = copy_to(my_db, Batting)}
 batting <- select(batting, playerid, yearid, teamid, g, ab:h)
 batting <- arrange(batting, playerid, yearid, teamid)
 players <- group_by(batting, playerid)
