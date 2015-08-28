@@ -50,18 +50,17 @@ flights2 =
   flights %>%
   select(year:day, hour, origin, dest, tailnum, carrier)
 
-flights2 %>%
-  left_join(airlines)
+left_join(flights2, airlines)
 
-flights2 %>% left_join(weather)
+left_join(flights2, weather)
 
-flights2 %>% left_join(planes, by = "tailnum")
+left_join(flights2, planes, by = "tailnum")
 
-flights2 %>% left_join(airports, c("dest" = "faa"))
+left_join(flights2, airports, c("dest" = "faa"))
 # not in dplyr dplyr/#1181
 # flights2 %>% left_join(airports, dest == faa)
 
-flights2 %>% left_join(airports, c("origin" = "faa"))
+left_join(flights2, airports, c("origin" = "faa"))
 
 
 (df1 = data_frame(x = c(1, 2), y = 2:1))
@@ -93,8 +92,8 @@ full_join(df2, df1) %>% collect
 #   count(tailnum, sort = TRUE)
 
 df1 %>% nrow()
-df1 %>% inner_join(df2, by = "x") %>% nrow()
-df1 %>% semi_join(df2, by = "x") %>% nrow()
+inner_join(df1, df2, by = "x") %>% collect
+semi_join(df1, df2, by = "x") %>% collect
 
 #need better examples here
 #intersect(df1, df2)
@@ -102,6 +101,5 @@ df1 %>% semi_join(df2, by = "x") %>% nrow()
 #setdiff(df1, df2)
 #setdiff(df2, df1)
 
-full_join(df1, df2)
 
 
