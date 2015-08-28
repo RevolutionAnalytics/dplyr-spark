@@ -44,19 +44,28 @@ c4 = arrange(c3, year, month, day, carrier)
 c4
 
 collect(c4, name = "c4", temporary = FALSE)
-c4$query
+c4$query$sql
 
 explain(c4)
 
 db_drop_table(my_db$con, "c4")
 
+flights %>%
+filter(year == 2013, month == 1, day == 1) %>%
+select(year, month, day, carrier, dep_delay, air_time, distance)  %>%
+mutate(speed = distance / air_time * 60) %>%
+arrange(year, month, day, carrier)
+
 
 daily = group_by(flights, year, month, day)
 
-bestworst = daily %>%
+bestworst =
+  daily %>%
   select(flight, arr_delay) %>%
   filter(arr_delay == min(arr_delay) || arr_delay == max(arr_delay))
 bestworst
+
+bestworst$query$sql
 
 ranked = daily %>%
   select(arr_delay) %>%
@@ -94,12 +103,14 @@ distinct(select(flights, origin, dest))
 mutate(
   flights,
   gain = arr_delay - dep_delay,
-  speed = distance / air_time * 60)
+  speed = distance / air_time * 60) %>%
+  select(flight, gain, speed)
 
 mutate(
   flights,
   gain = arr_delay - dep_delay,
-  gain_per_hour = gain / (air_time / 60))
+  gain_per_hour = gain / (air_time / 60))%>%
+  select(flight, gain, gain_per_hour)
 
 transmute(
   flights,
@@ -118,10 +129,12 @@ summarise(
 
 
 by_tailnum = group_by(flights, tailnum)
-delay = summarise(by_tailnum,
-                  count = n(),
-                  dist = mean(distance),
-                  delay = mean(arr_delay))
+delay =
+  summarise(
+    by_tailnum,
+    count = n(),
+    dist = mean(distance),
+    delay = mean(arr_delay))
 delay = filter(delay, count > 20, dist < 2000)
 delay_local = collect(delay)
 delay_local
