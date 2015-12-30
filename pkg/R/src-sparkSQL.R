@@ -50,15 +50,15 @@ first.not.empty =
     detect(list(...), ~.!="")
 
 dbConnect_retry =
-  function(dr, url, retry){
+  function(dr, url, retry, ...){
     if(retry > 0)
       tryCatch(
-        dbConnect(drv = dr, url = url),
+        dbConnect(drv = dr, url = url, ...),
         error =
           function(e) {
             Sys.sleep(0.1)
-            dbConnect_retry(dr = dr, url = url, retry - 1)})
-        else dbConnect(drv = dr, url = url)}
+            dbConnect_retry(dr = dr, url = url, retry - 1, ...)})
+        else dbConnect(drv = dr, url = url, ...)}
 
 src_SparkSQL =
   function(
@@ -71,7 +71,8 @@ src_SparkSQL =
         Sys.getenv("HIVE_SERVER2_THRIFT_PORT"),
         10000),
     start.server = !is.server.running(),
-    server.opts = list()) {
+    server.opts = list(),
+    ...) {
     final.env = NULL
     if(start.server) {
       do.call(
@@ -86,7 +87,7 @@ src_SparkSQL =
     driverclass = "org.apache.hive.jdbc.HiveDriver"
     dr = JDBC(driverclass, Sys.getenv("HADOOP_JAR"))
     url = paste0("jdbc:hive2://", host, ":", port)
-    con = new("SparkSQLConnection", dbConnect_retry(dr, url, 100))
+    con = new("SparkSQLConnection", dbConnect_retry(dr, url, 100, ...))
     pf = parent.frame()
     src_sql(
       "SparkSQL",
